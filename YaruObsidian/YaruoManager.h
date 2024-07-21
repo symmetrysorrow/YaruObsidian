@@ -14,7 +14,7 @@ class YaruoManager :public NovelManager {
 	std::string CorrectForOyogu(const std::string& HTML);
 
 	std::string removeBracketsContent(const std::string& input);
-	std::string RemoveLeadingSpace(const std::string& input);
+
 
 	void UpdateNovel(const int& CharacterAmount)override;
 	void GetNovelInfo()override;

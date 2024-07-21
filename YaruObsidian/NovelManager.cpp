@@ -1,7 +1,7 @@
 #pragma once
 #include "NovelManager.h"
 #include "BookshelfManager.h"
-
+#include <unordered_map>
 
 #pragma comment(lib, "wininet.lib")
 
@@ -10,13 +10,13 @@ NovelManager::NovelManager()
     BookshelfManagerPtr = nullptr;
 }
 
-void NovelManager::ManageNovel(BookshelfIndex Index)
+void NovelManager::ManageNovel(BookshelfIndex const Index)
 {
 	NovelIndex = Index;
     GetNovelInfo();
 }
 #if 1
-void NovelManager::CreateChapter(const std::string& NovelTitle, const std::string& ChapterTitle, const std::string& ChapterContents, NovelType novelSite)
+void NovelManager::CreateChapter(const std::string& NovelTitle, const std::string& ChapterTitle, const std::string& ChapterContents, NovelType novelSite) const
 {
     std::string ChapterPath, PreChapterPath, chapterTitle;
 
@@ -176,6 +176,67 @@ std::string NovelManager::removeSubstring(const std::string& str, const std::str
         result.erase(pos, substring.length());
     }
     return result;
+}
+
+std::string NovelManager::RemoveLeadingSpace(const std::string& input)
+{
+	const std::string fullWidthSpace = "\u3000";
+	const std::string halfWidthSpace = " ";
+
+	std::string result = input;
+
+	// 文字列が全角スペースで始まるかチェック
+	if (result.compare(0, fullWidthSpace.length(), fullWidthSpace) == 0)
+	{
+		// 全角スペースを削除した新しい文字列に更新
+		result = result.substr(fullWidthSpace.length());
+	}
+
+	// 文字列が半角スペースで始まるかチェック
+	if (result.compare(0, halfWidthSpace.length(), halfWidthSpace) == 0)
+	{
+		// 半角スペースを削除した新しい文字列に更新
+		result = result.substr(halfWidthSpace.length());
+	}
+
+	// スペースを削除した結果を返す
+	return result;
+}
+
+std::string NovelManager::decode_html_entities(const std::string& input)
+{
+    std::unordered_map<std::string, std::string> html_entities = {
+      {"&hellip;", "…"},
+      {"&#8230;", "..."}
+      // 必要に応じて他のエンティティを追加
+    };
+
+    std::string output;
+    std::string::size_type pos = 0, prev_pos = 0;
+
+    while ((pos = input.find('&', pos)) != std::string::npos) {
+        output.append(input, prev_pos, pos - prev_pos);
+        auto end_pos = input.find(';', pos);
+        if (end_pos != std::string::npos) {
+            std::string entity = input.substr(pos, end_pos - pos + 1);
+            auto it = html_entities.find(entity);
+            if (it != html_entities.end()) {
+                output.append(it->second);
+            }
+            else {
+                output.append(entity); // エンティティが見つからない場合はそのまま
+            }
+            pos = end_pos + 1;
+        }
+        else {
+            output.append("&"); // エンティティの終わりが見つからない場合はそのまま
+            ++pos;
+        }
+        prev_pos = pos;
+    }
+
+    output.append(input, prev_pos, input.length() - prev_pos);
+    return output;
 }
 
 void NovelManager::UpdateNovel(const int& ChapterAmount)

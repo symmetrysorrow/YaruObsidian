@@ -4,7 +4,7 @@
 
 void HamelnNovelManager::UpdateNovel(const int& ChapterAmount)
 {
-    std::string NovelTitle= removeSubstring(GetTitle(NovelURL), " - ハーメルン");
+    std::string NovelTitle=  removeSubstring(GetTitle(NovelURL), " - ハーメルン");
     std::filesystem::path path = "Novel/Hameln/" + NovelTitle;
     std::filesystem::create_directories(path);
 
@@ -19,7 +19,7 @@ void HamelnNovelManager::UpdateNovel(const int& ChapterAmount)
         regex pattern(R"(</div><span style=[^>]*>(.*?)</span><span id=\"analytics_start\">)", regex_constants::icase);
         smatch matches;
         if (regex_search(ChapterHTML, matches, pattern)) {
-            ChapterTitle = matches[1].str();
+           ChapterTitle = RemoveLeadingSpace(matches[1].str());
         }
 
         regex ContentPattern("<div id=\"honbun\"[^>]*>(.*?)</div>", regex_constants::icase | regex_constants::ECMAScript);

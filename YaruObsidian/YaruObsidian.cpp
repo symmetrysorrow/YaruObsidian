@@ -10,7 +10,7 @@ int main()
 {
     BookshelfManager* manager=new BookshelfManager;
     manager->ManageBookshelf();
-    std::cout << "\nCompleted\n";
+    std::cout << "Completed\n";
     delete manager;
     std::this_thread::sleep_for(std::chrono::minutes(60));
     system("YaruObsidian.exe");

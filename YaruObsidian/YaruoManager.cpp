@@ -13,7 +13,7 @@ std::string YaruoManager::CorrectForYaruyomi(const std::string& HTML)
         result += matches[0];
         searchStart = matches.suffix().first;
     }
-
+    result = "<span class=\"aa\">\n" + result;
     return result;
 }
 
@@ -34,6 +34,7 @@ std::string YaruoManager::CorrectForRusalka(const std::string& HTML)
     for (const auto& pattern : patterns) {
         result = std::regex_replace(result, pattern, "");
     }
+    result = "<span class=\"aa\">\n" + result;
     return result;
 }
 
@@ -51,6 +52,7 @@ std::string YaruoManager::CorrectForMex(const std::string& HTML)
     for (const auto& pattern : patterns) {
         result = std::regex_replace(result, pattern, "");
     }
+    result = "<span class=\"aa\">\n" + result;
     return result;
 }
 
@@ -67,6 +69,7 @@ std::string YaruoManager::CorrectForEro(const std::string& HTML)
     for (const auto& pattern : patterns) {
         result = std::regex_replace(result, pattern, "");
     }
+    result = "<span class=\"aa\">\n" + result;
     return result;
 }
 
@@ -84,6 +87,7 @@ std::string YaruoManager::CorrectForIitokolo(const std::string& HTML)
     for (const auto& pattern : patterns) {
         result = std::regex_replace(result, pattern, "");
     }
+    result = "<span class=\"aa\">\n" + result;
     return result;
 }
 
@@ -130,30 +134,6 @@ std::string YaruoManager::removeBracketsContent(const std::string& input)
     std::regex bracketPattern("【[^【】]*】");
     return std::regex_replace(input, bracketPattern, "");
 }
-
-std::string YaruoManager::RemoveLeadingSpace(const std::string& input)
-{
-    const std::string fullWidthSpace = "\u3000";
-    const std::string halfWidthSpace = " ";
-
-    std::string result = input;
-
-    // 文字列が全角スペースで始まるかチェック
-    if (result.compare(0, fullWidthSpace.length(), fullWidthSpace) == 0) {
-        // 全角スペースを削除した新しい文字列に更新
-        result = result.substr(fullWidthSpace.length());
-    }
-
-    // 文字列が半角スペースで始まるかチェック
-    if (result.compare(0, halfWidthSpace.length(), halfWidthSpace) == 0) {
-        // 半角スペースを削除した新しい文字列に更新
-        result = result.substr(halfWidthSpace.length());
-    }
-
-    // スペースを削除した結果を返す
-    return result;
-}
-
 
 void YaruoManager::UpdateNovel(const int& CharacterAmount)
 {
@@ -284,9 +264,11 @@ void YaruoManager::UpdateNovel(const int& CharacterAmount)
             {
                 ChapterContents = CorrectForOyogu(ChapterContents);
             }
-            
+
             ChapterTitle = removeSubstring(SanitizeFilename(GetHTMLTitle(ChapterHTML)),RemovedSiteTitle);
+            ChapterTitle = decode_html_entities(removeSubstring(ChapterTitle, "やる夫スレ本棚  _  "));
             ChapterTitle = RemoveLeadingSpace( removeBracketsContent( removeSubstring(ChapterTitle, NovelTitle)));
+            
             CreateChapter(NovelTitle, ChapterTitle, ChapterContents, NovelType::Yaruo);
             PreChapterTitle = ChapterTitle;
 
@@ -296,7 +278,7 @@ void YaruoManager::UpdateNovel(const int& CharacterAmount)
             i++;
             cout.flush();
         }
-        cout << "\n";
+        std::cout << "\n";
     }
 }
 

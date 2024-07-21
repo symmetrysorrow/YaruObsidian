@@ -95,9 +95,9 @@ void NocNovelManager::UpdateShort()
         cerr << "Failed to open file for writing.\n" << endl;
         return;
     }
-    std::string ChapterHTML = RemoveNewLines(GetHTML(NovelURL + "/"));
+    std::string ChapterHTML = RemoveNewLines(GetHTML(NovelURL));
 
-    regex ContentPattern("<div id=\"novel_honbun\"[^>]*>(.*?)</div>", regex_constants::icase | regex_constants::ECMAScript);
+    regex ContentPattern("<div id=\"novel_honbun\"(.*?)</div>", regex_constants::icase | regex_constants::ECMAScript);
     smatch ContentMatches;
     if (regex_search(ChapterHTML, ContentMatches, ContentPattern)) {
         // マッチした部分を表示
