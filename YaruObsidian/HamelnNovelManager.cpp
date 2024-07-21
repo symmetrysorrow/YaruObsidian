@@ -9,7 +9,7 @@ void HamelnNovelManager::UpdateNovel(const int& ChapterAmount)
     std::filesystem::create_directories(path);
 
     cout << "Updating Novel : " + GetTitle(NovelURL) + "\n";
-    BookshelfManagerPtr->UpdateMailText = BookshelfManagerPtr->UpdateMailText +GetTitle(NovelURL)+" / ";
+    BookshelfManagerPtr->UpdateMailText +=(NovelTitle+" - ");
 
     for (int i = 1; i <= ChapterAmount; i++)
     {        
