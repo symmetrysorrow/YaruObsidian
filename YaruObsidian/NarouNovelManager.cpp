@@ -58,7 +58,7 @@ void NarouNovelManager::UpdateShort()
 
     std::string ChapterHTML = RemoveNewLines(GetHTML(NovelURL + "/"));
 
-    regex ContentPattern("<div id=\"novel_honbun\"[^>]*>(.*?)</div>", regex_constants::icase | regex_constants::ECMAScript);
+    regex ContentPattern("<div id=\"novel_honbun\" class=\"novel_view\">(.*?)</div>", regex_constants::icase | regex_constants::ECMAScript);
     smatch ContentMatches;
     if (regex_search(ChapterHTML, ContentMatches, ContentPattern)) {
         // マッチした部分を表示
@@ -87,7 +87,7 @@ void NarouNovelManager::GetNovelInfo()
     {
         if (DateMatches[1].str() != NovelIndex.LastUpdatedDate)
         {
-            regex pattern(R"(全(\d+)エピソード)");
+            regex pattern(R"(全(\d+)エピソード<a)");
             smatch matches;
             if (regex_search(NovelInfoHTML, matches, pattern) && stoi(matches[1].str()) >= NovelIndex.ChapterAmount)
             {

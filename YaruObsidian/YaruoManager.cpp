@@ -267,7 +267,7 @@ void YaruoManager::UpdateNovel(const int& CharacterAmount)
 
             ChapterTitle = removeSubstring(SanitizeFilename(GetHTMLTitle(ChapterHTML)),RemovedSiteTitle);
             ChapterTitle = decode_html_entities(removeSubstring(ChapterTitle, "やる夫スレ本棚  _  "));
-            ChapterTitle = RemoveLeadingSpace( removeBracketsContent( removeSubstring(ChapterTitle, NovelTitle)));
+            ChapterTitle = removeBracketsContent( removeSubstring(ChapterTitle, NovelTitle));
             
             CreateChapter(NovelTitle, ChapterTitle, ChapterContents, NovelType::Yaruo);
             PreChapterTitle = ChapterTitle;

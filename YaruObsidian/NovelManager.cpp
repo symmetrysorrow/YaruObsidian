@@ -16,42 +16,46 @@ void NovelManager::ManageNovel(BookshelfIndex const Index)
     GetNovelInfo();
 }
 #if 1
-void NovelManager::CreateChapter(const std::string& NovelTitle, const std::string& ChapterTitle, const std::string& ChapterContents, NovelType novelSite) const
+void NovelManager::CreateChapter(const std::string& NovelTitle, const std::string& ChapterTitle, const std::string& ChapterContents, NovelType novelSite) 
 {
-    std::string ChapterPath, PreChapterPath, chapterTitle;
+    std::string ChapterPath, PreChapterPath, chapterTitle,preChapterTitle;
 
-    ChapterTitle == "" ? chapterTitle = "1" : chapterTitle = ChapterTitle;
+    ChapterTitle == "" ? chapterTitle = "1" : chapterTitle = RemoveLeadingSpace(ChapterTitle) ;
+    preChapterTitle = RemoveLeadingSpace(PreChapterTitle);
 
     switch (novelSite)
     {
     case Narou:
         ChapterPath = "Novel/Narou/" + NovelTitle + "/" + chapterTitle +".md";
-        PreChapterPath= "Novel/Narou/" + NovelTitle + "/" + PreChapterTitle + ".md";
+        PreChapterPath= "Novel/Narou/" + NovelTitle + "/" + preChapterTitle + ".md";
         break;
     case Hameln:
         ChapterPath = "Novel/Hameln/" + NovelTitle + "/" + chapterTitle + ".md";
-        PreChapterPath = "Novel/Hameln/" + NovelTitle + "/" + PreChapterTitle + ".md";
+        PreChapterPath = "Novel/Hameln/" + NovelTitle + "/" + preChapterTitle + ".md";
         break;
     case Noc:
         ChapterPath = "Novel/Noc/" + NovelTitle + "/" + chapterTitle + ".md";
-        PreChapterPath = "Novel/Noc/" + NovelTitle + "/" + PreChapterTitle + ".md";
+        PreChapterPath = "Novel/Noc/" + NovelTitle + "/" + preChapterTitle + ".md";
         break;
     case Yaruo:
         ChapterPath = "Yaruo/" + NovelTitle + "/" + chapterTitle + ".md";
-        PreChapterPath = "Yaruo/" + NovelTitle + "/" + PreChapterTitle + ".md";
+        PreChapterPath = "Yaruo/" + NovelTitle + "/" + preChapterTitle + ".md";
         break;
     }
 
     if (PreChapterTitle!="")
     {
-        ofstream file(ChapterPath, ios::out);
-        file << ChapterContents << "\n\n" << " [[" << PreChapterTitle << "| < 前へ]]\n" << endl;
-        file.close();
 
         std::ofstream outfile;
         outfile.open(PreChapterPath, std::ios::app);
         outfile << " [[" << chapterTitle << "| 次へ >]] \n" << endl;
         outfile.close();
+
+       // std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        ofstream file(ChapterPath, ios::out);
+
+        file << ChapterContents << "\n\n" << " [[" << preChapterTitle << "| < 前へ]]\n" << endl;
+        file.close();        
     }
     else
     {
@@ -59,9 +63,6 @@ void NovelManager::CreateChapter(const std::string& NovelTitle, const std::strin
         file << ChapterContents << "\n\n" << endl;
         file.close();
     }
- 
-    
-
 }
 #endif
 std::string NovelManager::GetHTML(const std::string& URL)
@@ -180,27 +181,39 @@ std::string NovelManager::removeSubstring(const std::string& str, const std::str
 
 std::string NovelManager::RemoveLeadingSpace(const std::string& input)
 {
-	const std::string fullWidthSpace = "\u3000";
-	const std::string halfWidthSpace = " ";
+    const std::string fullWidthSpace = "\u3000";
+    const std::string halfWidthSpace = " ";
 
-	std::string result = input;
+    std::string result = input;
 
-	// 文字列が全角スペースで始まるかチェック
-	if (result.compare(0, fullWidthSpace.length(), fullWidthSpace) == 0)
-	{
-		// 全角スペースを削除した新しい文字列に更新
-		result = result.substr(fullWidthSpace.length());
-	}
+    // 文字列が全角スペースで始まるかチェック
+    if (result.compare(0, fullWidthSpace.length(), fullWidthSpace) == 0) {
+        // 全角スペースを削除した新しい文字列に更新
+        result = result.substr(fullWidthSpace.length());
+    }
 
-	// 文字列が半角スペースで始まるかチェック
-	if (result.compare(0, halfWidthSpace.length(), halfWidthSpace) == 0)
-	{
-		// 半角スペースを削除した新しい文字列に更新
-		result = result.substr(halfWidthSpace.length());
-	}
+    // 文字列が半角スペースで始まるかチェック
+    if (result.compare(0, halfWidthSpace.length(), halfWidthSpace) == 0) {
+        // 半角スペースを削除した新しい文字列に更新
+        result = result.substr(halfWidthSpace.length());
+    }
 
-	// スペースを削除した結果を返す
-	return result;
+    // 文字列が全角スペースで終わるかチェック
+    if (result.length() >= fullWidthSpace.length() &&
+        result.compare(result.length() - fullWidthSpace.length(), fullWidthSpace.length(), fullWidthSpace) == 0) {
+        // 全角スペースを削除した新しい文字列に更新
+        result = result.substr(0, result.length() - fullWidthSpace.length());
+    }
+
+    // 文字列が半角スペースで終わるかチェック
+    if (result.length() >= halfWidthSpace.length() &&
+        result.compare(result.length() - halfWidthSpace.length(), halfWidthSpace.length(), halfWidthSpace) == 0) {
+        // 半角スペースを削除した新しい文字列に更新
+        result = result.substr(0, result.length() - halfWidthSpace.length());
+    }
+
+    // スペースを削除した結果を返す
+    return result;
 }
 
 std::string NovelManager::decode_html_entities(const std::string& input)

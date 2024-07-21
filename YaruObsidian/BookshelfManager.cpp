@@ -287,7 +287,7 @@ void BookshelfManager::SendNotification()
     }
     if(UpdateMailText.empty())
     {
-        cout << "There is no novel to be updated";
+        cout << "There is no novel to be updated\n";
     }       
 }
 
