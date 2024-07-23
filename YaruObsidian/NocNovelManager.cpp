@@ -113,7 +113,7 @@ void NocNovelManager::UpdateShort()
 
     return;
 }
-
+#if 0
 std::string NocNovelManager::GetHTML(const std::string& URL)
 {
 	std::random_device rd;
@@ -164,3 +164,4 @@ std::string NocNovelManager::GetHTML(const std::string& URL)
 
     return htmlContent;
 }
+#endif

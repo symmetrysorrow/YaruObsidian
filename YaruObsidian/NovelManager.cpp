@@ -92,6 +92,8 @@ std::string NovelManager::GetHTML(const std::string& URL)
 	    std::cerr << "Failed to initialize WinINet" << std::endl;
         return "";
     }
+    SetCookie("https://novel18.syosetu.com", "over18=yes");
+    SetCookie("https://syosetu.org", "over18=off");
     // URLを開く
     HINTERNET hUrl = InternetOpenUrl(hInternet, wideUrl.c_str(), NULL, 0, INTERNET_FLAG_RELOAD, 0);
     if (hUrl == NULL) 
