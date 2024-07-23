@@ -9,7 +9,7 @@ void NarouNovelManager::UpdateNovel(const int& ChapterAmount)
     std::filesystem::create_directories(path); 
 
     cout << "Updating Novel : " + NovelTitle + "\n";
-    BookshelfManagerPtr->UpdateMailText+=((NovelTitle) + " - ");
+    BookshelfManagerPtr->UpdateMailText += (NovelTitle + "　");
 
     for (int i = 1; i <= ChapterAmount; i++)
     {

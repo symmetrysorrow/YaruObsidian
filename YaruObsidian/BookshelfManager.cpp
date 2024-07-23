@@ -13,7 +13,7 @@
 #include <fstream>
 #include <sstream>
 #include <Windows.h>
-#include <winhttp.h>
+//#include <winhttp.h>
 #include <cstdlib>
 
 namespace sstd { class sockSSL; }
@@ -283,7 +283,7 @@ void BookshelfManager::SendNotification()
     {
         std::string Command = "python SendMail.py 更新がありました "+UpdateMailText;
         system(Command.c_str());
-        cout << "Send Notification";
+        cout << "Send Notification\n";
     }
     if(UpdateMailText.empty())
     {

@@ -180,7 +180,7 @@ void YaruoManager::UpdateNovel(const int& CharacterAmount)
         std::string Target = LinkList[1];
         int i = 1;
         cout << "Updating Novel : " + NovelTitle + "\n";
-        BookshelfManagerPtr->UpdateMailText +=(SanitizeFilename(NovelTitle)+" - ");
+        BookshelfManagerPtr->UpdateMailText += (NovelTitle + "　");
 
         for (auto& Link : std::vector<std::string>(LinkList.rbegin(), LinkList.rend()))
         {

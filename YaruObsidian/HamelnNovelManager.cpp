@@ -8,8 +8,8 @@ void HamelnNovelManager::UpdateNovel(const int& ChapterAmount)
     std::filesystem::path path = "Novel/Hameln/" + NovelTitle;
     std::filesystem::create_directories(path);
 
-    cout << "Updating Novel : " + GetTitle(NovelURL) + "\n";
-    BookshelfManagerPtr->UpdateMailText +=(NovelTitle+" - ");
+    cout << "Updating Novel : " + NovelTitle + "\n";
+    BookshelfManagerPtr->UpdateMailText += (NovelTitle + "　");
 
     for (int i = 1; i <= ChapterAmount; i++)
     {        

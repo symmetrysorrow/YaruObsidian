@@ -9,7 +9,7 @@ void NocNovelManager::UpdateNovel(const int& ChapterAmount)
     std::filesystem::create_directories(path);
 
     cout << "Updating Novel : " + NovelTitle + "\n";
-    BookshelfManagerPtr->UpdateMailText+=(NovelTitle+" - ");
+    BookshelfManagerPtr->UpdateMailText += (NovelTitle + "　");
 
     for (int i = 1; i <= ChapterAmount; i++)
     {
@@ -71,9 +71,8 @@ void NocNovelManager::GetNovelInfo()
             }
             if (!regex_search(NovelInfoHTML, matches, pattern))
             {
-                std::cout << "Update Short\n";
-                UpdateShort();
-                return;
+	            UpdateShort();
+	            return;
             }
         }
         BookshelfManagerPtr->AppendToBookshelf("Noc.csv", NovelIndex.NovelID + "," + to_string(NovelIndex.ChapterAmount) + "," + DateMatches[1].str());
