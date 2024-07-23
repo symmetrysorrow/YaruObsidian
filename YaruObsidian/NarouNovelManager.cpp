@@ -49,7 +49,7 @@ void NarouNovelManager::UpdateShort()
     std::string NovelPath = "Novel/Narou/" + NovelTitle + ".md";
     std::ofstream file(NovelPath, std::ios::out);
 
-    std::cout << "Updating Novel : " + NovelTitle + "\n";
+    std::cout << "Updating Short : " + NovelTitle + "\n";
 
     if (!file) {
 	    std::cerr << "Failed to open file for writing.\n" << std::endl;
@@ -66,7 +66,7 @@ void NarouNovelManager::UpdateShort()
     }
     if (!regex_search(ChapterHTML, ContentMatches, ContentPattern))
     {
-        std::cout << "Not Found";
+        std::cout << "Not Found\n";
     }
     std::cout << "100%\n";
 
@@ -87,7 +87,7 @@ void NarouNovelManager::GetNovelInfo()
     {
         if (DateMatches[1].str() != NovelIndex.LastUpdatedDate)
         {
-            std::regex pattern(R"(全(\d+)エピソード<a)");
+            std::regex pattern(R"(</span>全(\d+)エピソード)");
             std::smatch matches;
             if (regex_search(NovelInfoHTML, matches, pattern) && stoi(matches[1].str()) >= NovelIndex.ChapterAmount)
             {

@@ -105,7 +105,7 @@ void NocNovelManager::UpdateShort()
     }
     if (!regex_search(ChapterHTML, ContentMatches, ContentPattern))
     {
-        std::cout << "Not Found";
+        std::cout << "Not Found\n";
     }
     std::cout << "100%\n";
 
