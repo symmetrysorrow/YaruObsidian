@@ -21,12 +21,12 @@ namespace sstd { class sockSSL; }
 void BookshelfManager::ManageBookshelf()
 {
     GetMailInfo();
-    cout << "Loading Bookshelves...\n";
+    std::cout << "Loading Bookshelves...\n";
     LoadBookshelf("Narou.csv");
     LoadBookshelf("Noc.csv");
     LoadBookshelf("Hameln.csv");
     LoadBookshelf("Yaruo.csv");
-    cout << "Bookshelves Loading Finished\n";
+    std::cout << "Bookshelves Loading Finished\n";
     UpdateNovels();
     SendNotification();
     SendWarning();
@@ -34,9 +34,9 @@ void BookshelfManager::ManageBookshelf()
 
 void BookshelfManager::LoadBookshelf(std::string filename) {
 
-    ifstream file("Bookshelves/" + filename);
+    std::ifstream file("Bookshelves/" + filename);
     if (!file.is_open()) {
-        cerr << "Failed to open file: " << filename << endl;
+        std::cerr << "Failed to open file: " << filename << std::endl;
         return;
     }
 
@@ -53,7 +53,7 @@ void BookshelfManager::LoadBookshelf(std::string filename) {
         tokens.push_back(line);
 
         if (tokens.size() != 3) {
-            cerr << "Invalid line: " << line << endl;
+            std::cerr << "Invalid line: " << line << std::endl;
             continue;
         }
 
@@ -83,9 +83,9 @@ void BookshelfManager::LoadBookshelf(std::string filename) {
     }
     file.close();
 
-    ofstream ofs("Bookshelves/" + filename, ofstream::out | ofstream::trunc);
+    std::ofstream ofs("Bookshelves/" + filename, std::ofstream::out | std::ofstream::trunc);
     if (!ofs.is_open()) {
-        cerr << "Failed to open file for truncating: " << filename << endl;
+        std::cerr << "Failed to open file for truncating: " << filename << std::endl;
         return;
     }
     ofs.close();
@@ -93,13 +93,13 @@ void BookshelfManager::LoadBookshelf(std::string filename) {
 
 void BookshelfManager::AppendToBookshelf(const std::string& filename, const std::string& data)
 {
-    ofstream file("Bookshelves/" + filename, ios::app); // 追記モードでファイルを開く
+    std::ofstream file("Bookshelves/" + filename, std::ios::app); // 追記モードでファイルを開く
     if (!file.is_open()) {
-        cerr << "Failed to open file: " << filename << endl;
+        std::cerr << "Failed to open file: " << filename << std::endl;
         return;
     }
 
-    file << data << endl; // データをファイルに書き込む
+    file << data << std::endl; // データをファイルに書き込む
 
     file.close();
 }
@@ -144,58 +144,58 @@ void BookshelfManager::GetMailInfo()
     for (const auto& line : lines) {
 
         // Regular expression to capture the domain part
-        regex domainPattern(R"(https://([^/]+)/)");
+        std::regex domainPattern(R"(https://([^/]+)/)");
 
         // Match object to hold the results for the domain
-        smatch domainMatches;
+        std::smatch domainMatches;
 
         if (regex_search(line, domainMatches, domainPattern) && domainMatches.size() == 2) {
             std::string domain = domainMatches[1].str();
 
             if (domain == "ncode.syosetu.com") {
                 // Regular expression to capture the code part
-                regex ncodePattern(R"(https://ncode.syosetu.com/([^/]+)/)");
-                smatch ncodeMatches;
+                std::regex ncodePattern(R"(https://ncode.syosetu.com/([^/]+)/)");
+                std::smatch ncodeMatches;
 
                 if (regex_search(line, ncodeMatches, ncodePattern) && ncodeMatches.size() == 2) {
                     std::string ncode = ncodeMatches[1].str();
                     AppendToBookshelf("Narou.csv", ncode + ",1,1");
-                    cout << "New Novel : " << ncode<<"\n";
+                    std::cout << "New Novel : " << ncode<<"\n";
                 }
             }
 
             if (domain == "syosetu.org") {
                 // Regular expression to capture the code part
-                regex HamPattern(R"(https://syosetu.org/novel/([^/]+)/)");
-                smatch HamMatches;
+                std::regex HamPattern(R"(https://syosetu.org/novel/([^/]+)/)");
+                std::smatch HamMatches;
 
                 if (regex_search(line, HamMatches, HamPattern) && HamMatches.size() == 2) {
                     std::string HamID = HamMatches[1].str();
                     AppendToBookshelf("Hameln.csv", HamID + ",1,1");
-                    cout << "New Novel : " << HamID << "\n";
+                    std::cout << "New Novel : " << HamID << "\n";
                 }
             }
             if (domain == "novel18.syosetu.com") {
                 // Regular expression to capture the code part
-                regex NocPattern(R"(https://novel18.syosetu.com/([^/]+)/)");
-                smatch NocMatches;
+                std::regex NocPattern(R"(https://novel18.syosetu.com/([^/]+)/)");
+                std::smatch NocMatches;
 
                 if (regex_search(line, NocMatches, NocPattern) && NocMatches.size() == 2) {
                     std::string NocCode = NocMatches[1].str();
                     AppendToBookshelf("Noc.csv", NocCode + ",1,1");
-                    cout << "New Novel : " << NocCode << "\n";
+                    std::cout << "New Novel : " << NocCode << "\n";
                 }
             }
             if (domain == "rss.r401.net")
             {
                 // Regular expression to capture the code part
-                regex YaruoPattern(R"(https://rss.r401.net/yaruo/categories/([^/]+))");
-                smatch YaruoMatches;
+                std::regex YaruoPattern(R"(https://rss.r401.net/yaruo/categories/([^/]+))");
+                std::smatch YaruoMatches;
 
                 if (regex_search(line, YaruoMatches, YaruoPattern) && YaruoMatches.size() == 2) {
                     std:: string YaruoCode = YaruoMatches[1].str();
                     AppendToBookshelf("Yaruo.csv", YaruoCode + ",1,1");
-                    cout << "New Novel : " << YaruoCode << "\n";
+                    std::cout << "New Novel : " << YaruoCode << "\n";
                 }
             }
 
@@ -207,14 +207,14 @@ std::vector<std::string> BookshelfManager::get_mail_first_lines()
 {
         std::vector<std::string> result;
 
-        filesystem::path exePath = filesystem::current_path();
+        std::filesystem::path exePath = std::filesystem::current_path();
         exePath /= "MailFetcher.py";
 
         // MailFetcher.pyが存在するかチェック
-        if (!filesystem::exists(exePath)) {
+        if (!std::filesystem::exists(exePath)) {
             return result;
         }
-        cout << "Fetching Email...\n";
+        std::cout << "Fetching Email...\n";
 
         // Initialize Python interpreter
         Py_Initialize();
@@ -252,52 +252,52 @@ std::vector<std::string> BookshelfManager::get_mail_first_lines()
                 }
                 else {
                     PyErr_Print();
-                    cerr << "Call to get_mail_first_lines failed" << endl;
+                    std::cerr << "Call to get_mail_first_lines failed" << std::endl;
                 }
             }
             else {
                 PyErr_Print();
-                cerr << "Cannot find function get_mail_first_lines" << endl;
+                std::cerr << "Cannot find function get_mail_first_lines" << std::endl;
             }
             Py_XDECREF(pFunc);
             Py_DECREF(pModule);
         }
         else {
             PyErr_Print();
-            cerr << "Failed to load example module" << endl;
+            std::cerr << "Failed to load example module" << std::endl;
         }
 
         // Finalize Python interpreter
         Py_Finalize();
-        cout << "Email Data Extraction Finished\n";
+        std::cout << "Email Data Extraction Finished\n";
         return result;
     
 }
 
 void BookshelfManager::SendNotification()
 {
-    filesystem::path exePath = filesystem::current_path();
+    std::filesystem::path exePath = std::filesystem::current_path();
     exePath /= "sendMail.py";
 
-    if (!UpdateMailText.empty()&& filesystem::exists(exePath))
+    if (!UpdateMailText.empty()&& std::filesystem::exists(exePath))
     {
         std::string Command = "python SendMail.py 更新がありました "+UpdateMailText;
         system(Command.c_str());
-        cout << "Send Notification\n";
+        std::cout << "Send Notification\n";
     }
     if(UpdateMailText.empty())
     {
-        cout << "There is no novel to be updated\n";
+        std::cout << "There is no novel to be updated\n";
     }       
 }
 
 void BookshelfManager::SendWarning()
 {
-    filesystem::path exePath = filesystem::current_path();
+    std::filesystem::path exePath = std::filesystem::current_path();
     exePath /= "sendMail.py";
 
     // MailFetcher.pyが存在するかチェック
-    if (!filesystem::exists(exePath)) {
+    if (!std::filesystem::exists(exePath)) {
         return;
     }
 

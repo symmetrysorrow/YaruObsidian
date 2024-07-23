@@ -8,29 +8,29 @@ void HamelnNovelManager::UpdateNovel(const int& ChapterAmount)
     std::filesystem::path path = "Novel/Hameln/" + NovelTitle;
     std::filesystem::create_directories(path);
 
-    cout << "Updating Novel : " + NovelTitle + "\n";
+    std::cout << "Updating Novel : " + NovelTitle + "\n";
     BookshelfManagerPtr->UpdateMailText += (NovelTitle + "　");
 
     for (int i = 1; i <= ChapterAmount; i++)
     {        
-        std::string ChapterHTML = RemoveNewLines(GetHTML(NovelURL + to_string(i) + ".html"));
+        std::string ChapterHTML = RemoveNewLines(GetHTML(NovelURL + std::to_string(i) + ".html"));
         std::string ChapterTitle, ChapterContents;
 
-        regex pattern(R"(</div><span style=[^>]*>(.*?)</span><span id=\"analytics_start\">)", regex_constants::icase);
-        smatch matches;
+        std::regex pattern(R"(</div><span style=[^>]*>(.*?)</span><span id=\"analytics_start\">)", std::regex_constants::icase);
+        std::smatch matches;
         if (regex_search(ChapterHTML, matches, pattern)) {
            //ChapterTitle = RemoveLeadingSpace(matches[1].str());
             ChapterTitle = matches[1].str();
         }
 
-        regex ContentPattern("<div id=\"honbun\"[^>]*>(.*?)</div>", regex_constants::icase | regex_constants::ECMAScript);
-        smatch ContentMatches;
+        std::regex ContentPattern("<div id=\"honbun\"[^>]*>(.*?)</div>", std::regex_constants::icase | std::regex_constants::ECMAScript);
+        std::smatch ContentMatches;
         if (regex_search(ChapterHTML, ContentMatches, ContentPattern)) {
             ChapterContents = ContentMatches[1].str();
         }
 
         std::string NovelPath = "Novel/Hameln/" + NovelTitle + "/" + ChapterTitle  + ".md";
-        ofstream file(NovelPath, ios::out);
+        std::ofstream file(NovelPath, std::ios::out);
         file << ChapterContents << "\n";
         file.close();
 
@@ -39,10 +39,10 @@ void HamelnNovelManager::UpdateNovel(const int& ChapterAmount)
 
         //進捗率の計算と表示
         double progress = i == ChapterAmount ? 100 : static_cast<double>(i) / ChapterAmount * 100.0;
-        cout << "\rProgress: " << fixed << setprecision(2) << progress << "%";
-        cout.flush();    
+        std::cout << "\rProgress: " << std::fixed << std::setprecision(2) << progress << "%";
+        std::cout.flush();    
     }
-    cout << endl; // 改行して進捗表示をクリア
+    std::cout << std::endl; // 改行して進捗表示をクリア
     return;
 }
 
@@ -52,16 +52,16 @@ void HamelnNovelManager::GetNovelInfo()
     NovelURL = "https://syosetu.org/novel/" + NovelIndex.NovelID + "/";
     std::string NovelInfoHTML = RemoveNewLines(GetHTML(InfoURL));
 
-    regex DatePattern(R"(最新投稿</td><td>(.*?)</td>)", regex_constants::icase);
-    smatch DateMatches;
+    std::regex DatePattern(R"(最新投稿</td><td>(.*?)</td>)", std::regex_constants::icase);
+    std::smatch DateMatches;
 
     if (regex_search(NovelInfoHTML, DateMatches, DatePattern))
     {
 
         if (DateMatches[1].str() != NovelIndex.LastUpdatedDate)
         {
-            regex pattern(R"(話数</td><td width=[^>]*>[^\s]*\s(.*?)話)");
-            smatch matches;
+            std::regex pattern(R"(話数</td><td width=[^>]*>[^\s]*\s(.*?)話)");
+            std::smatch matches;
             if (regex_search(NovelInfoHTML, matches, pattern) && stoi(matches[1].str()) >= NovelIndex.ChapterAmount)
             {
                 // cout << matches[1].str()<<"\n";
@@ -75,12 +75,12 @@ void HamelnNovelManager::GetNovelInfo()
                 return;
             }
         }
-        BookshelfManagerPtr->AppendToBookshelf("Hameln.csv", NovelIndex.NovelID + "," + to_string(NovelIndex.ChapterAmount) + "," + DateMatches[1].str());
-        cout << "No Need To Update " + GetTitle(NovelURL) + "\n";
+        BookshelfManagerPtr->AppendToBookshelf("Hameln.csv", NovelIndex.NovelID + "," + std::to_string(NovelIndex.ChapterAmount) + "," + DateMatches[1].str());
+        std::cout << "No Need To Update " + GetTitle(NovelURL) + "\n";
         return;
     }
-    cout << "Error. Novel Is not Found";
-    BookshelfManagerPtr->AppendToBookshelf("Hameln.csv", NovelIndex.NovelID + "," + to_string(NovelIndex.ChapterAmount) + "," + NovelIndex.LastUpdatedDate);
+    std::cout << "Error. Novel Is not Found";
+    BookshelfManagerPtr->AppendToBookshelf("Hameln.csv", NovelIndex.NovelID + "," + std::to_string(NovelIndex.ChapterAmount) + "," + NovelIndex.LastUpdatedDate);
     return;
 }
 

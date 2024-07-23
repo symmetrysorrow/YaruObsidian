@@ -48,32 +48,32 @@ void NovelManager::CreateChapter(const std::string& NovelTitle, const std::strin
 
         std::ofstream outfile;
         outfile.open(PreChapterPath, std::ios::app);
-        outfile << " [[" << chapterTitle << "| 次へ >]] \n" << endl;
+        outfile << " [[" << chapterTitle << "| 次へ >]] \n" << std::endl;
         outfile.close();
 
        // std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        ofstream file(ChapterPath, ios::out);
+        std::ofstream file(ChapterPath, std::ios::out);
 
-        file << ChapterContents << "\n\n" << " [[" << preChapterTitle << "| < 前へ]]\n" << endl;
+        file << ChapterContents << "\n\n" << " [[" << preChapterTitle << "| < 前へ]]\n" << std::endl;
         file.close();        
     }
     else
     {
-        ofstream file(ChapterPath, ios::out);
-        file << ChapterContents << "\n\n" << endl;
+	    std::ofstream file(ChapterPath, std::ios::out);
+        file << ChapterContents << "\n\n" << std::endl;
         file.close();
     }
 }
 #endif
 std::string NovelManager::GetHTML(const std::string& URL)
 {
-    random_device rd;
-    uniform_int_distribution<int> dist(1000, 2000);
+	std::random_device rd;
+	std::uniform_int_distribution<int> dist(1000, 2000);
     int random_ms = dist(rd);
-    this_thread::sleep_for(chrono::milliseconds(random_ms));
+	std::this_thread::sleep_for(std::chrono::milliseconds(random_ms));
 
     // Unicode文字列に変換
-    wstring wideUrl;
+	std::wstring wideUrl;
     int bufferSize = MultiByteToWideChar(CP_UTF8, 0, URL.c_str(), -1, nullptr, 0);
     if (bufferSize > 0) 
     {
@@ -82,26 +82,26 @@ std::string NovelManager::GetHTML(const std::string& URL)
     }
     else 
     {
-        cerr << "Failed to convert URL to wide string" << endl;
+	    std::cerr << "Failed to convert URL to wide string" << std::endl;
         return "";
     }
     // WinINetの初期化
     HINTERNET hInternet = InternetOpen(L"MyApp", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
     if (hInternet == NULL) 
     {
-        cerr << "Failed to initialize WinINet" << endl;
+	    std::cerr << "Failed to initialize WinINet" << std::endl;
         return "";
     }
     // URLを開く
     HINTERNET hUrl = InternetOpenUrl(hInternet, wideUrl.c_str(), NULL, 0, INTERNET_FLAG_RELOAD, 0);
     if (hUrl == NULL) 
     {
-        cerr << "Failed to open URL" << endl;
+	    std::cerr << "Failed to open URL" << std::endl;
         InternetCloseHandle(hInternet);
         return "";
     }
     // HTMLコンテンツを取得
-    string htmlContent;
+    std::string htmlContent;
     char buffer[1024];
     DWORD bytesRead = 0;
     while (InternetReadFile(hUrl, buffer, sizeof(buffer), &bytesRead) && bytesRead > 0) 
@@ -117,9 +117,9 @@ std::string NovelManager::GetHTML(const std::string& URL)
 
 std::string NovelManager::GetTitle(std::string URL)
 {
-    string TargetHTML = GetHTML(URL);
-    regex titlePattern(R"(<title>(.*?)<\/title>)");
-    smatch matches;
+    std::string TargetHTML = GetHTML(URL);
+    std::regex titlePattern(R"(<title>(.*?)<\/title>)");
+    std::smatch matches;
     if (regex_search(TargetHTML, matches, titlePattern) && matches.size() > 1) 
     {
         return matches[1].str();
@@ -129,8 +129,8 @@ std::string NovelManager::GetTitle(std::string URL)
 
 std::string NovelManager::GetHTMLTitle(const std::string& HTML)
 {
-    regex titlePattern(R"(<title>(.*?)<\/title>)");
-    smatch matches;
+    std::regex titlePattern(R"(<title>(.*?)<\/title>)");
+    std::smatch matches;
     if (regex_search(HTML, matches, titlePattern) && matches.size() > 1)
     {
         return matches[1].str();

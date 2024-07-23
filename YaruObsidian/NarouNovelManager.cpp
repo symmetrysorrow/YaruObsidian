@@ -8,24 +8,24 @@ void NarouNovelManager::UpdateNovel(const int& ChapterAmount)
     std::filesystem::path path = "Novel/Narou/" + NovelTitle;
     std::filesystem::create_directories(path); 
 
-    cout << "Updating Novel : " + NovelTitle + "\n";
+    std::cout << "Updating Novel : " + NovelTitle + "\n";
     BookshelfManagerPtr->UpdateMailText += (NovelTitle + "　");
 
     for (int i = 1; i <= ChapterAmount; i++)
     {
-        std::string ChapterHTML = RemoveNewLines(GetHTML(NovelURL + to_string(i) + "/"));
+        std::string ChapterHTML = RemoveNewLines(GetHTML(NovelURL + std::to_string(i) + "/"));
         std::string ChapterTitle, ChapterContents;
 
-        regex pattern("<p class=\"novel_subtitle\">(.+?)</p>");
-        smatch matches;
+        std::regex pattern("<p class=\"novel_subtitle\">(.+?)</p>");
+        std::smatch matches;
         // 正規表現を使用してテキストを抽出
         if (regex_search(ChapterHTML, matches, pattern)) {
             // マッチした部分を表示
             ChapterTitle= matches[1].str();
         }
 
-        regex ContentPattern("<div id=\"novel_honbun\"[^>]*>(.*?)</div>", regex_constants::icase | regex_constants::ECMAScript);
-        smatch ContentMatches;
+        std::regex ContentPattern("<div id=\"novel_honbun\"[^>]*>(.*?)</div>", std::regex_constants::icase | std::regex_constants::ECMAScript);
+        std::smatch ContentMatches;
         if (regex_search(ChapterHTML, ContentMatches, ContentPattern)) {
             // マッチした部分を表示
             ChapterContents = ContentMatches[1].str();
@@ -36,10 +36,10 @@ void NarouNovelManager::UpdateNovel(const int& ChapterAmount)
        
         //進捗率の計算と表示
         double progress = i == ChapterAmount ? 100 : static_cast<double>(i) / ChapterAmount * 100.0;
-        cout << "\rProgress: " << fixed << setprecision(2) << progress << "%";
-        cout.flush();
+        std::cout << "\rProgress: " << std::fixed << std::setprecision(2) << progress << "%";
+        std::cout.flush();
     }
-    cout << endl; // 改行して進捗表示をクリア
+    std::cout << std::endl; // 改行して進捗表示をクリア
     return;
 }
 
@@ -47,28 +47,28 @@ void NarouNovelManager::UpdateShort()
 {
     std::string NovelTitle = GetTitle(NovelURL);
     std::string NovelPath = "Novel/Narou/" + NovelTitle + ".md";
-    ofstream file(NovelPath, ios::out);
+    std::ofstream file(NovelPath, std::ios::out);
 
-    cout << "Updating Novel : " + NovelTitle + "\n";
+    std::cout << "Updating Novel : " + NovelTitle + "\n";
 
     if (!file) {
-        cerr << "Failed to open file for writing.\n" << endl;
+	    std::cerr << "Failed to open file for writing.\n" << std::endl;
         return;
     }
 
     std::string ChapterHTML = RemoveNewLines(GetHTML(NovelURL + "/"));
 
-    regex ContentPattern("<div id=\"novel_honbun\" class=\"novel_view\">(.*?)</div>", regex_constants::icase | regex_constants::ECMAScript);
-    smatch ContentMatches;
+    std::regex ContentPattern("<div id=\"novel_honbun\" class=\"novel_view\">(.*?)</div>", std::regex_constants::icase | std::regex_constants::ECMAScript);
+    std::smatch ContentMatches;
     if (regex_search(ChapterHTML, ContentMatches, ContentPattern)) {
         // マッチした部分を表示
-        file << ContentMatches[1].str() << "\n" << endl;
+        file << ContentMatches[1].str() << "\n" << std::endl;
     }
     if (!regex_search(ChapterHTML, ContentMatches, ContentPattern))
     {
-        cout << "Not Found";
+        std::cout << "Not Found";
     }
-    cout << "100%\n";
+    std::cout << "100%\n";
 
     file.close();
 
@@ -81,14 +81,14 @@ void NarouNovelManager::GetNovelInfo()
     NovelURL = "https://ncode.syosetu.com/" + NovelIndex.NovelID + "/";
     std::string NovelInfoHTML = GetHTML(InfoURL);
 
-    regex DatePattern(R"(<th>最.*掲載日</th>\s*<td>(.*?)<\/td>)", regex_constants::icase);
-    smatch DateMatches;
+    std::regex DatePattern(R"(<th>最.*掲載日</th>\s*<td>(.*?)<\/td>)", std::regex_constants::icase);
+    std::smatch DateMatches;
     if (regex_search(NovelInfoHTML, DateMatches, DatePattern))
     {
         if (DateMatches[1].str() != NovelIndex.LastUpdatedDate)
         {
-            regex pattern(R"(全(\d+)エピソード<a)");
-            smatch matches;
+            std::regex pattern(R"(全(\d+)エピソード<a)");
+            std::smatch matches;
             if (regex_search(NovelInfoHTML, matches, pattern) && stoi(matches[1].str()) >= NovelIndex.ChapterAmount)
             {
                 UpdateNovel(stoi(matches[1].str()));
@@ -101,11 +101,11 @@ void NarouNovelManager::GetNovelInfo()
                 return;
             }
         }
-        BookshelfManagerPtr->AppendToBookshelf("Narou.csv", NovelIndex.NovelID + "," + to_string(NovelIndex.ChapterAmount) + "," + DateMatches[1].str());
-        cout << "No Need To Update " + GetTitle(NovelURL) + "\n";
+        BookshelfManagerPtr->AppendToBookshelf("Narou.csv", NovelIndex.NovelID + "," + std::to_string(NovelIndex.ChapterAmount) + "," + DateMatches[1].str());
+        std::cout << "No Need To Update " + GetTitle(NovelURL) + "\n";
         return;
     }
-    BookshelfManagerPtr->AppendToBookshelf("Narou.csv", NovelIndex.NovelID + "," + to_string(NovelIndex.ChapterAmount) + "," + NovelIndex.LastUpdatedDate);
-    cout << "Error. Novel Is not Found";
+    BookshelfManagerPtr->AppendToBookshelf("Narou.csv", NovelIndex.NovelID + "," + std::to_string(NovelIndex.ChapterAmount) + "," + NovelIndex.LastUpdatedDate);
+    std::cout << "Error. Novel Is not Found";
     return;
 }

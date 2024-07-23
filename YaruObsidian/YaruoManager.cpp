@@ -139,16 +139,16 @@ void YaruoManager::UpdateNovel(const int& CharacterAmount)
 {
     std::vector<std::string> LinkList;
 
-    string NovelTitle = removeSubstring(GetHTMLTitle(NovelInfoHTML), " | やる夫RSS+インデックス");
+    std::string NovelTitle = removeSubstring(GetHTMLTitle(NovelInfoHTML), " | やる夫RSS+インデックス");
     NovelTitle = removeBracketsContent(NovelTitle);
     std::filesystem::path path = "Yaruo/" + NovelTitle;
     std::filesystem::create_directories(path);
 
-    regex PagePattern(R"(<div class="paginate_link">(.*?)</div>)", regex_constants::icase);
-    smatch PageMatches;
+    std::regex PagePattern(R"(<div class="paginate_link">(.*?)</div>)", std::regex_constants::icase);
+    std::smatch PageMatches;
     if (regex_search(NovelInfoHTML, PageMatches, PagePattern))
     {
-        regex urlPattern(R"(<a href=\"(.*?)\">)", regex_constants::icase);
+        std::regex urlPattern(R"(<a href=\"(.*?)\">)", std::regex_constants::icase);
         // 正規表現による検索
         std::string LinkHTML = PageMatches[1].str();
         auto it = std::sregex_iterator(LinkHTML.begin(), LinkHTML.end(), urlPattern);
@@ -157,7 +157,7 @@ void YaruoManager::UpdateNovel(const int& CharacterAmount)
         for (; it != end; ++it) {
             std::smatch match = *it;
             std::string PageContents = GetHTML("https://rss.r401.net" + match[1].str());
-            regex LinkPattern(R"(<a target="_blank" rel="nofollow" class="exlink" href="(.*?)\">)", regex_constants::icase);
+            std::regex LinkPattern(R"(<a target="_blank" rel="nofollow" class="exlink" href="(.*?)\">)", std::regex_constants::icase);
             auto it1 = std::sregex_iterator(PageContents.begin(), PageContents.end(), LinkPattern);
             auto end1 = std::sregex_iterator();
 
@@ -172,14 +172,14 @@ void YaruoManager::UpdateNovel(const int& CharacterAmount)
 
         if (ChapterAm < NovelIndex.ChapterAmount)
         {
-            cout << ChapterAm <<"<<"<<NovelIndex.ChapterAmount;
-            cout << "\nWarning : Chapter is decreased\n";
+            std::cout << ChapterAm <<"<<"<<NovelIndex.ChapterAmount;
+            std::cout << "\nWarning : Chapter is decreased\n";
             return;
         }
 
         std::string Target = LinkList[1];
         int i = 1;
-        cout << "Updating Novel : " + NovelTitle + "\n";
+        std::cout << "Updating Novel : " + NovelTitle + "\n";
         BookshelfManagerPtr->UpdateMailText += (NovelTitle + "　");
 
         for (auto& Link : std::vector<std::string>(LinkList.rbegin(), LinkList.rend()))
@@ -187,47 +187,47 @@ void YaruoManager::UpdateNovel(const int& CharacterAmount)
             std::string ChapterHTML = RemoveNewLines(GetHTML(Link));
             std::string ChapterTitle, ChapterContents, RemovedSiteTitle;
 
-            regex ChapterContentsPattern;
-            smatch ChapterContentsMatch;
+            std::regex ChapterContentsPattern;
+            std::smatch ChapterContentsMatch;
 
             if (Target.find("yaruomatomex") != std::string::npos)
             {
-                ChapterContentsPattern = std::regex(R"(<div class="article">(.*?)</div>)", regex_constants::icase);
+                ChapterContentsPattern = std::regex(R"(<div class="article">(.*?)</div>)", std::regex_constants::icase);
                 RemovedSiteTitle = "やる夫まとめくす ";
             }
             if (Target.find("rusalka") != std::string::npos)
             {
-                ChapterContentsPattern = std::regex(R"(</a></h3>(.*?)<!--/article)", regex_constants::icase);
+                ChapterContentsPattern = std::regex(R"(</a></h3>(.*?)<!--/article)", std::regex_constants::icase);
                 RemovedSiteTitle = "100%自分用やる夫まとめ ";
             }
             if (Target.find("yaruobook") != std::string::npos)
             {
-                ChapterContentsPattern = std::regex(R"(<dl>(.*?)</dl>)", regex_constants::icase);
+                ChapterContentsPattern = std::regex(R"(<dl>(.*?)</dl>)", std::regex_constants::icase);
                 RemovedSiteTitle = "やる夫スレ本棚 _ ";
             }
             if (Target.find("himanatokiniyaruo") != std::string::npos)
             {
-                ChapterContentsPattern = std::regex(R"(<div class="entry-body"><dl>(.*?)</dl>)", regex_constants::icase);
+                ChapterContentsPattern = std::regex(R"(<div class="entry-body"><dl>(.*?)</dl>)", std::regex_constants::icase);
                 RemovedSiteTitle = " - 暇な時にやる夫まとめ";
             }
             if (Target.find("yaruyomi") != std::string::npos)
             {
-                ChapterContentsPattern = std::regex(R"(<article class="wrapper aa">(.*?)</article>)", regex_constants::icase);
+                ChapterContentsPattern = std::regex(R"(<article class="wrapper aa">(.*?)</article>)", std::regex_constants::icase);
                 RemovedSiteTitle = " - Yaruyomi";
             }
             if (Target.find("iitokolo") != std::string::npos)
             {
-                ChapterContentsPattern = std::regex(R"(<div class="article">(.*?)</div>)", regex_constants::icase);
+                ChapterContentsPattern = std::regex(R"(<div class="article">(.*?)</div>)", std::regex_constants::icase);
                 RemovedSiteTitle = "面白かったやる夫スレをまとめるサイト ";
             }
             if (Target.find("burakio") != std::string::npos)
             {
-                ChapterContentsPattern = std::regex(R"(<div class="article"><span class="aa">(.*?)<div class="fc2_footer")", regex_constants::icase);
+                ChapterContentsPattern = std::regex(R"(<div class="article"><span class="aa">(.*?)<div class="fc2_footer")", std::regex_constants::icase);
                 RemovedSiteTitle = "やる夫の暇つぶし麻亜屈（まーくつー） ";
             }
             if (Target.find("oyogu") != std::string::npos)
             {
-                ChapterContentsPattern = std::regex(R"(<div class="article">(.*?)</div>)", regex_constants::icase);
+                ChapterContentsPattern = std::regex(R"(<div class="article">(.*?)</div>)", std::regex_constants::icase);
                 RemovedSiteTitle = "泳ぐやる夫シアター ";
             }
 
@@ -274,9 +274,9 @@ void YaruoManager::UpdateNovel(const int& CharacterAmount)
 
             //進捗率の計算と表示
             double progress = i == LinkList.size() ? 100 : static_cast<double>(i) / LinkList.size() * 100.0;
-            cout << "\rProgress: " << fixed << setprecision(2) << progress << "%";
+            std::cout << "\rProgress: " << std::fixed << std::setprecision(2) << progress << "%";
             i++;
-            cout.flush();
+            std::cout.flush();
         }
         std::cout << "\n";
     }
@@ -288,23 +288,23 @@ void YaruoManager::GetNovelInfo()
 
     NovelInfoHTML = RemoveNewLines(GetHTML(InfoURL));
 
-    regex DatePattern(R"(<div class="item-date">(.*?)<a href=)", regex_constants::icase);
-    smatch DateMatches;
+    std::regex DatePattern(R"(<div class="item-date">(.*?)<a href=)", std::regex_constants::icase);
+    std::smatch DateMatches;
 
     if (regex_search(NovelInfoHTML, DateMatches, DatePattern))
     {
         if (DateMatches[1].str() != NovelIndex.LastUpdatedDate)
         {
             UpdateNovel(NovelIndex.ChapterAmount);
-            BookshelfManagerPtr->AppendToBookshelf("Yaruo.csv", NovelIndex.NovelID + "," + to_string(ChapterAm) + "," + DateMatches[1].str());
+            BookshelfManagerPtr->AppendToBookshelf("Yaruo.csv", NovelIndex.NovelID + "," + std::to_string(ChapterAm) + "," + DateMatches[1].str());
             return;
         }
-        BookshelfManagerPtr->AppendToBookshelf("Yaruo.csv", NovelIndex.NovelID + "," + to_string(NovelIndex.ChapterAmount) + "," + DateMatches[1].str());
-        cout << "No Need To Update " + GetTitle(InfoURL) + "\n";
+        BookshelfManagerPtr->AppendToBookshelf("Yaruo.csv", NovelIndex.NovelID + "," + std::to_string(NovelIndex.ChapterAmount) + "," + DateMatches[1].str());
+        std::cout << "No Need To Update " + GetTitle(InfoURL) + "\n";
         return;
     }
-    cout << "Error. Novel Is not Found\n";
-    BookshelfManagerPtr->AppendToBookshelf("Yaruo.csv", NovelIndex.NovelID + "," + to_string(NovelIndex.ChapterAmount) + "," + NovelIndex.LastUpdatedDate);
+    std::cout << "Error. Novel Is not Found\n";
+    BookshelfManagerPtr->AppendToBookshelf("Yaruo.csv", NovelIndex.NovelID + "," + std::to_string(NovelIndex.ChapterAmount) + "," + NovelIndex.LastUpdatedDate);
     return;
 }
 

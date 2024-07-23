@@ -9,14 +9,9 @@
 #include <random>
 #include <chrono>
 #include <thread>
-#include <iomanip>
-#include <vector>
-#include <locale>
 #include <filesystem>
 #include "BookshelfIndex.h"
 
-
-using namespace std;
 class BookshelfManager;
 
 class NovelManager {
