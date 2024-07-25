@@ -39,6 +39,7 @@ void NocNovelManager::UpdateNovel(const int& ChapterAmount)
         std::cout << "\rProgress: " << std::fixed << std::setprecision(2) << progress << "%";
         std::cout.flush();
     }
+
     std::cout << std::endl; // 改行して進捗表示をクリア
 
     return;

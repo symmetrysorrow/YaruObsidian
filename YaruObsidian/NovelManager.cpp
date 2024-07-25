@@ -54,7 +54,7 @@ void NovelManager::CreateChapter(const std::string& NovelTitle, const std::strin
        // std::this_thread::sleep_for(std::chrono::milliseconds(500));
         std::ofstream file(ChapterPath, std::ios::out);
 
-        file << ChapterContents << "\n\n" << " [[" << preChapterTitle << "| < 前へ]]\n" << std::endl;
+        file << ChapterContents << "\n\n" << "<br></br>\n   [[" << preChapterTitle << "| < 前へ]]\n" << std::endl;
         file.close();        
     }
     else
