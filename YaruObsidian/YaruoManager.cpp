@@ -139,8 +139,6 @@ void YaruoManager::UpdateNovel(const int& CharacterAmount)
 {
     std::vector<std::string> LinkList;
 
-    std::string NovelTitle = removeSubstring(GetHTMLTitle(NovelInfoHTML), " | やる夫RSS+インデックス");
-    NovelTitle = removeBracketsContent(NovelTitle);
     std::filesystem::path path = "Yaruo/" + NovelTitle;
     std::filesystem::create_directories(path);
 
@@ -269,7 +267,7 @@ void YaruoManager::UpdateNovel(const int& CharacterAmount)
             ChapterTitle = decode_html_entities(removeSubstring(ChapterTitle, "やる夫スレ本棚  _  "));
             ChapterTitle = removeBracketsContent( removeSubstring(ChapterTitle, NovelTitle));
             
-            CreateChapter(NovelTitle, ChapterTitle, ChapterContents, NovelType::Yaruo);
+            CreateChapter(ChapterTitle, ChapterContents, NovelType::Yaruo);
             PreChapterTitle = ChapterTitle;
 
             //進捗率の計算と表示
@@ -287,6 +285,8 @@ void YaruoManager::GetNovelInfo()
     InfoURL = "https://rss.r401.net/yaruo/categories/" + NovelIndex.NovelID;
 
     NovelInfoHTML = RemoveNewLines(GetHTML(InfoURL));
+    NovelTitle = removeSubstring(GetHTMLTitle(NovelInfoHTML), " | やる夫RSS+インデックス");
+    NovelTitle = removeBracketsContent(NovelTitle);
 
     std::regex DatePattern(R"(<div class="item-date">(.*?)<a href=)", std::regex_constants::icase);
     std::smatch DateMatches;
@@ -300,7 +300,7 @@ void YaruoManager::GetNovelInfo()
             return;
         }
         BookshelfManagerPtr->AppendToBookshelf("Yaruo.csv", NovelIndex.NovelID + "," + std::to_string(NovelIndex.ChapterAmount) + "," + DateMatches[1].str());
-        std::cout << "No Need To Update " + GetTitle(InfoURL) + "\n";
+        std::cout << "No Need To Update " + NovelTitle + "\n";
         return;
     }
     std::cout << "Error. Novel Is not Found\n";

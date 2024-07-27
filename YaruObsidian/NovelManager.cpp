@@ -14,9 +14,14 @@ void NovelManager::ManageNovel(BookshelfIndex const Index)
 {
 	NovelIndex = Index;
     GetNovelInfo();
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::ofstream outfile;
+    outfile.open(LastChapterPath, std::ios::app);
+    outfile <<  "\n";
+    outfile.close();
 }
 #if 1
-void NovelManager::CreateChapter(const std::string& NovelTitle, const std::string& ChapterTitle, const std::string& ChapterContents, NovelType novelSite) 
+void NovelManager::CreateChapter(const std::string& ChapterTitle, const std::string& ChapterContents, NovelType novelSite) 
 {
     std::string ChapterPath, PreChapterPath, chapterTitle,preChapterTitle;
 
@@ -43,6 +48,8 @@ void NovelManager::CreateChapter(const std::string& NovelTitle, const std::strin
         break;
     }
 
+    LastChapterPath = ChapterPath;
+
     if (PreChapterTitle!="")
     {
 
@@ -63,6 +70,7 @@ void NovelManager::CreateChapter(const std::string& NovelTitle, const std::strin
         file << ChapterContents << "\n\n" << std::endl;
         file.close();
     }
+    
 }
 #endif
 std::string NovelManager::GetHTML(const std::string& URL)

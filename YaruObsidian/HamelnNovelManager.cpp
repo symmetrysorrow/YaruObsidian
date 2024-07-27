@@ -4,7 +4,6 @@
 
 void HamelnNovelManager::UpdateNovel(const int& ChapterAmount)
 {
-    std::string NovelTitle=  removeSubstring(GetTitle(NovelURL), " - ハーメルン");
     std::filesystem::path path = "Novel/Hameln/" + NovelTitle;
     std::filesystem::create_directories(path);
 
@@ -34,7 +33,7 @@ void HamelnNovelManager::UpdateNovel(const int& ChapterAmount)
         file << ChapterContents << "\n";
         file.close();
 
-        CreateChapter(NovelTitle, ChapterTitle, ChapterContents, NovelType::Hameln);
+        CreateChapter(ChapterTitle, ChapterContents, NovelType::Hameln);
         PreChapterTitle = ChapterTitle;
 
         //進捗率の計算と表示
@@ -51,6 +50,8 @@ void HamelnNovelManager::GetNovelInfo()
     InfoURL = "https://syosetu.org/?mode=ss_detail&nid=" + NovelIndex.NovelID;
     NovelURL = "https://syosetu.org/novel/" + NovelIndex.NovelID + "/";
     std::string NovelInfoHTML = RemoveNewLines(GetHTML(InfoURL));
+
+    NovelTitle = removeSubstring(GetTitle(NovelURL), " - ハーメルン");
 
     std::regex DatePattern(R"(最新投稿</td><td>(.*?)</td>)", std::regex_constants::icase);
     std::smatch DateMatches;
@@ -76,7 +77,7 @@ void HamelnNovelManager::GetNovelInfo()
             }
         }
         BookshelfManagerPtr->AppendToBookshelf("Hameln.csv", NovelIndex.NovelID + "," + std::to_string(NovelIndex.ChapterAmount) + "," + DateMatches[1].str());
-        std::cout << "No Need To Update " + GetTitle(NovelURL) + "\n";
+        std::cout << "No Need To Update " + NovelTitle + "\n";
         return;
     }
     std::cout << "Error. Novel Is not Found";

@@ -4,7 +4,7 @@
 
 void NocNovelManager::UpdateNovel(const int& ChapterAmount)
 {
-    std::string NovelTitle = GetTitle(NovelURL);
+    NovelTitle = GetTitle(NovelURL);
     std::filesystem::path path = "Novel/Noc/" + NovelTitle;
     std::filesystem::create_directories(path);
 
@@ -31,7 +31,7 @@ void NocNovelManager::UpdateNovel(const int& ChapterAmount)
             ChapterContents=ContentMatches[1].str();
         }
 
-        CreateChapter(NovelTitle, ChapterTitle, ChapterContents, NovelType::Noc);
+        CreateChapter(ChapterTitle, ChapterContents, NovelType::Noc);
         PreChapterTitle = ChapterTitle;
 
         //進捗率の計算と表示
@@ -51,9 +51,7 @@ void NocNovelManager::GetNovelInfo()
     NovelURL = "https://novel18.syosetu.com/" + NovelIndex.NovelID + "/";
     std::string NovelInfoHTML = RemoveNewLines(GetHTML(InfoURL));
 
-    //  cout << GetTitle(NovelInfoHTML)<<"\n";
-    // GetCookies("https://novel18.syosetu.com");
-    // cout << NovelInfoHTML<<"\n";
+    NovelTitle = GetTitle(NovelURL);
 
     std::regex DatePattern(R"(<th>最.*日</th><td>(.*?)</td>)", std::regex_constants::icase);
     std::smatch DateMatches;
@@ -76,7 +74,7 @@ void NocNovelManager::GetNovelInfo()
             }
         }
         BookshelfManagerPtr->AppendToBookshelf("Noc.csv", NovelIndex.NovelID + "," + std::to_string(NovelIndex.ChapterAmount) + "," + DateMatches[1].str());
-        std::cout << "No Need To Update " + GetTitle(NovelURL) + "\n";
+        std::cout << "No Need To Update " + NovelTitle + "\n";
         return;
     }
     BookshelfManagerPtr->AppendToBookshelf("Noc.csv", NovelIndex.NovelID + ",1,1");

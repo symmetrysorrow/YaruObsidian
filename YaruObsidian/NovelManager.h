@@ -25,8 +25,10 @@ protected:
 	std::string InfoURL;
 	std::string NovelURL;
 	std::string PreChapterTitle="";
+	std::string NovelTitle;
+	std::string LastChapterPath;
 
-	void CreateChapter(const std::string& NovelTitle, const std::string& ChapterTitle, const std::string& ChapterContents, NovelType novelSite);
+	void CreateChapter(const std::string& ChapterTitle, const std::string& ChapterContents, NovelType novelSite);
 	virtual std::string GetHTML(const std::string& URL);
 	std::string GetTitle(std::string URL);
 	std::string GetHTMLTitle(const std::string& HTML);

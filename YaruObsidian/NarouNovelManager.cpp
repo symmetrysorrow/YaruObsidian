@@ -4,7 +4,7 @@
 
 void NarouNovelManager::UpdateNovel(const int& ChapterAmount)
 {
-    std::string NovelTitle =GetTitle(NovelURL);
+    
     std::filesystem::path path = "Novel/Narou/" + NovelTitle;
     std::filesystem::create_directories(path); 
 
@@ -31,7 +31,7 @@ void NarouNovelManager::UpdateNovel(const int& ChapterAmount)
             ChapterContents = ContentMatches[1].str();
         }
 
-        CreateChapter(NovelTitle, ChapterTitle, ChapterContents, NovelType::Narou);
+        CreateChapter(ChapterTitle, ChapterContents, NovelType::Narou);
         PreChapterTitle = ChapterTitle;
        
         //進捗率の計算と表示
@@ -81,6 +81,8 @@ void NarouNovelManager::GetNovelInfo()
     NovelURL = "https://ncode.syosetu.com/" + NovelIndex.NovelID + "/";
     std::string NovelInfoHTML = GetHTML(InfoURL);
 
+    NovelTitle = GetTitle(NovelURL);
+
     std::regex DatePattern(R"(<th>最.*掲載日</th>\s*<td>(.*?)<\/td>)", std::regex_constants::icase);
     std::smatch DateMatches;
     if (regex_search(NovelInfoHTML, DateMatches, DatePattern))
@@ -102,7 +104,7 @@ void NarouNovelManager::GetNovelInfo()
             }
         }
         BookshelfManagerPtr->AppendToBookshelf("Narou.csv", NovelIndex.NovelID + "," + std::to_string(NovelIndex.ChapterAmount) + "," + DateMatches[1].str());
-        std::cout << "No Need To Update " + GetTitle(NovelURL) + "\n";
+        std::cout << "No Need To Update " + NovelTitle + "\n";
         return;
     }
     BookshelfManagerPtr->AppendToBookshelf("Narou.csv", NovelIndex.NovelID + "," + std::to_string(NovelIndex.ChapterAmount) + "," + NovelIndex.LastUpdatedDate);
