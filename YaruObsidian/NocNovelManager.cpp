@@ -77,6 +77,13 @@ void NocNovelManager::GetNovelInfo()
         std::cout << "No Need To Update " + NovelTitle + "\n";
         return;
     }
+    std::regex DatePattern_short(R"(<th>掲載日</th><td>(.*?)</td>)", std::regex_constants::icase);
+    std::smatch Matches;
+    if (regex_search(NovelInfoHTML, Matches, DatePattern_short))
+    {
+        UpdateShort();
+        return;
+    }
     BookshelfManagerPtr->AppendToBookshelf("Noc.csv", NovelIndex.NovelID + ",1,1");
     std::cout << "Error. Novel Is not Found";
     return;

@@ -4,8 +4,9 @@
 #include "HamelnNovelManager.h"
 #include "NocNovelManager.h"
 #include "YaruoManager.h"
-
 #include "BookshelfManager.h"
+
+#include <algorithm>
 #include <locale>
 #include <codecvt>
 #include <Python.h>
@@ -106,6 +107,23 @@ void BookshelfManager::AppendToBookshelf(const std::string& filename, const std:
 
 void BookshelfManager::UpdateNovels()
 {
+    
+    std::sort(NarouBookshelves.begin(), NarouBookshelves.end());
+    NarouBookshelves.erase(std::unique(NarouBookshelves.begin(),NarouBookshelves.end()), NarouBookshelves.end());
+    
+    std::sort(HamelnBookshelves.begin(), HamelnBookshelves.end());
+    auto Hit = std::unique(HamelnBookshelves.begin(), HamelnBookshelves.end());
+    HamelnBookshelves.erase(Hit, HamelnBookshelves.end());
+
+    std::sort(NocBookshelves.begin(), NocBookshelves.end());
+    auto Nocit = std::unique(NocBookshelves.begin(), NocBookshelves.end());
+    NocBookshelves.erase(Nocit, NocBookshelves.end());
+
+    std::sort(YaruoBookshelves.begin(), YaruoBookshelves.end());
+    auto Yit = std::unique(YaruoBookshelves.begin(), YaruoBookshelves.end());
+    YaruoBookshelves.erase(Yit, YaruoBookshelves.end());
+    
+
     for (const auto& bookshelfIndex : NarouBookshelves) {
         NarouNovelManager* NarouManager = new NarouNovelManager;
         NarouManager->BookshelfManagerPtr = this;
@@ -130,7 +148,6 @@ void BookshelfManager::UpdateNovels()
         YaruManager->ManageNovel(bookshelfIndex);
         delete YaruManager;
     }
-    
 }
 
 void BookshelfManager::GetMailInfo()

@@ -107,6 +107,13 @@ void NarouNovelManager::GetNovelInfo()
         std::cout << "No Need To Update " + NovelTitle + "\n";
         return;
     }
+    std::regex DatePattern_short(R"(掲載日)", std::regex_constants::icase);
+    std::smatch Matches;
+    if (regex_search(NovelInfoHTML, Matches, DatePattern_short))
+    {
+        UpdateShort();
+        return;
+    }
     BookshelfManagerPtr->AppendToBookshelf("Narou.csv", NovelIndex.NovelID + "," + std::to_string(NovelIndex.ChapterAmount) + "," + NovelIndex.LastUpdatedDate);
     std::cout << "Error. Novel Is not Found";
     return;

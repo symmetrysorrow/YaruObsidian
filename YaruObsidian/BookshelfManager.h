@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include "BookshelfIndex.h"
-#include <iostream>
 #include <vector>
 
 class BookshelfManager {
