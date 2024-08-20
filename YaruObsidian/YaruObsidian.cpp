@@ -7,12 +7,13 @@
 //#include <windows.h>
 #include <future>
 
-int main()
-{
-    BookshelfManager* manager = new BookshelfManager;
-    manager->ManageBookshelf();
-    std::cout << "Completed\n";
-    delete manager;
+int main() {
+    // Create and manage BookshelfManager
+    {
+        BookshelfManager manager;
+        manager.ManageBookshelf();
+        std::cout << "Completed\n";
+    } // manager goes out of scope and is destructed here
 
     // Future object to wait for user input in another thread
     std::future<void> future = std::async(std::launch::async, []() {
@@ -27,6 +28,8 @@ int main()
         std::cout << "1 hour passed, executing YaruObsidian.exe\n";
     }
 
+    // Execute the external program
     system("YaruObsidian.exe");
+
     return 0;
 }
