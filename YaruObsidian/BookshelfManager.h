@@ -23,6 +23,7 @@ public:
     void ManageBookshelf();
     void OrganizeNovel(const NovelSite& Site, std::string& NovelID);
     void AppendToBookshelf(const std::string& filename, const std::string& data);
+    void LoadBookshelf(const NovelSite& Site);
     std::string UpdateMailText="";
     std::string WarningMailText="";
 
@@ -46,7 +47,7 @@ private:
     void UpdateNovels();
     std::string GetCSVFile(const NovelSite& Site);
     void SaveBookshelves(const NovelSite& Site);
-    void LoadBookshelf(const NovelSite& Site);
+    
     bool stringToBool(const std::string& str);
     void GetMailInfo();
     std::vector<std::string> get_mail_first_NovelURLs();

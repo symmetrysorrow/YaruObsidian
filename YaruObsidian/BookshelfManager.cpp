@@ -53,6 +53,7 @@ void BookshelfManager::AddNovel(const std::string& NovelURL)
 
             if (regex_search(NovelURL, ncodeMatches, ncodePattern) && ncodeMatches.size() == 2) {
                 NewNovel.NovelID = ncodeMatches[1].str();
+                NewNovel.Directory = "Novel/Narou";
                 NarouBooks[NewNovel.NovelID] = NewNovel;
                 std::cout << "New Novel : " << NewNovel.NovelTitle << "\n";
                 SaveBookshelves(NovelSite::Narou);
@@ -67,6 +68,7 @@ void BookshelfManager::AddNovel(const std::string& NovelURL)
 
             if (regex_search(NovelURL, HamMatches, HamPattern) && HamMatches.size() == 2) {
                 NewNovel.NovelID = HamMatches[1].str();
+                NewNovel.Directory = "Novel/Hameln";
                 HamelnBooks[NewNovel.NovelID] = NewNovel;
                 std::cout << "New Novel : " << NewNovel.NovelTitle << "\n";
                 SaveBookshelves(NovelSite::Hameln);
@@ -80,6 +82,7 @@ void BookshelfManager::AddNovel(const std::string& NovelURL)
 
             if (regex_search(NovelURL, NocMatches, NocPattern) && NocMatches.size() == 2) {
                 NewNovel.NovelID = NocMatches[1].str();
+                NewNovel.Directory = "Novel/Noc";
                 NocBooks[NewNovel.NovelID] = NewNovel;
                 std::cout << "New Novel : " << NewNovel.NovelTitle << "\n";
                 SaveBookshelves(NovelSite::Noc);
@@ -94,6 +97,7 @@ void BookshelfManager::AddNovel(const std::string& NovelURL)
 
             if (regex_search(NovelURL, YaruoMatches, YaruoPattern) && YaruoMatches.size() == 2) {
                 NewNovel.NovelID = YaruoMatches[1].str();
+                NewNovel.Directory = "Yaruo";
                 YaruoBooks[NewNovel.NovelID] = NewNovel;
                 std::cout << "New Novel : " << NewNovel.NovelTitle << "\n";
                 SaveBookshelves(NovelSite::Yaruo);
@@ -144,25 +148,24 @@ void BookshelfManager::LoadBookshelf(const NovelSite& Site) {
     {
     case::Hameln:
         Bookshelf = &HamelnBooks;
-        filename = "./Bookshelves/Hameln.json";
+        filename = "./.Bookshelves/Hameln.json";
         break;
     case::Narou:
         Bookshelf = &NarouBooks;
-        filename = "./Bookshelves/Narou.json";
+        filename = "./.Bookshelves/Narou.json";
         break;
     case::Yaruo:
         Bookshelf = &YaruoBooks;
-        filename = "./Bookshelves/Yaruo.json";
+        filename = "./.Bookshelves/Yaruo.json";
         break;
     case::Noc:
         Bookshelf = &NocBooks;
-        filename = "./Bookshelves/Noc.json";
+        filename = "./.Bookshelves/Noc.json";
         break;
     default:
         Bookshelf = nullptr;
         break;
     }
-    std::cout << "Load:PreOpen\n";
     std::ifstream file(filename);
     if (!file.is_open()) {
         std::ofstream new_file(filename);
@@ -175,7 +178,6 @@ void BookshelfManager::LoadBookshelf(const NovelSite& Site) {
     {
         std::cout << "Bookshelf is nullptr\n";
     }
-    std::cout << "Load:close\n";
     for (auto it = json_obj.begin(); it != json_obj.end(); ++it) {
         BookshelfIndex index;
         index.ChapterAmount = it.value().at("ChapterAmount");
@@ -186,7 +188,6 @@ void BookshelfManager::LoadBookshelf(const NovelSite& Site) {
         index.NovelID = it.key();
        ( *Bookshelf)[it.key()] = index;
     }
-    std::cout << "Load:SetValues\n";
 }
 
 bool BookshelfManager::stringToBool(const std::string& str)
@@ -288,19 +289,19 @@ void BookshelfManager::SaveBookshelves(const NovelSite& Site)
     {
     case::Hameln:
         Bookshelf = &HamelnBooks;
-        filename = "./Bookshelves/Hameln.json";
+        filename = "./.Bookshelves/Hameln.json";
         break;
     case::Narou:
         Bookshelf = &NarouBooks;
-        filename = "./Bookshelves/Narou.json";
+        filename = "./.Bookshelves/Narou.json";
         break;
     case::Yaruo:
         Bookshelf = &YaruoBooks;
-        filename = "./Bookshelves/Yaruo.json";
+        filename = "./.Bookshelves/Yaruo.json";
         break;
     case::Noc:
         Bookshelf = &NocBooks;
-        filename = "./Bookshelves/Noc.json";
+        filename = "./.Bookshelves/Noc.json";
         break;
     default:
     	Bookshelf = nullptr;

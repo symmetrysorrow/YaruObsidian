@@ -56,6 +56,10 @@ void UserInterface::ManageCommand(const std::string& input)
 UserInterface::UserInterface():
 	BookMG(new BookshelfManager())
 {
+    BookMG->LoadBookshelf(NovelSite::Hameln);
+    BookMG->LoadBookshelf(NovelSite::Narou);
+    BookMG->LoadBookshelf(NovelSite::Noc);
+    BookMG->LoadBookshelf(NovelSite::Yaruo);
 }
 
 void UserInterface::AddNovelCmd()
