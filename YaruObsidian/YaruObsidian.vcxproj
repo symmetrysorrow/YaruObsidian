@@ -160,7 +160,7 @@
     <ClCompile Include="NarouNovelManager.cpp" />
     <ClCompile Include="NocNovelManager.cpp" />
     <ClCompile Include="NovelManager.cpp" />
-    <ClInclude Include="UserInterface.cpp" />
+    <ClCompile Include="UserInterface.cpp" />
     <ClCompile Include="YaruObsidian.cpp" />
     <ClCompile Include="YaruoManager.cpp" />
   </ItemGroup>

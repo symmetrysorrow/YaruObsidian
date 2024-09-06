@@ -11,6 +11,7 @@ class UserInterface
 {
 public:
 	void ManageCommand(const std::string& command);
+	UserInterface();
 private:
 	void AddNovelCmd();
 	void DeleteNovelCmd();
@@ -20,11 +21,11 @@ private:
 	void OrganizeNovelsCmd();
 	void StopUpdateCmd();
 
-	BookshelfManager& BookMG;
+	BookshelfManager* BookMG;
 
-	HamelnNovelManager& HamelnMG;
-	NarouNovelManager& NarouMG;
-	NocNovelManager& NocMG;
-	YaruoManager& YaruoMG;
+	HamelnNovelManager* HamelnMG;
+	NarouNovelManager* NarouMG;
+	NocNovelManager* NocMG;
+	YaruoManager* YaruoMG;
 };
 

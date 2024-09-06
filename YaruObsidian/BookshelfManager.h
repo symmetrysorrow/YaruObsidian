@@ -15,7 +15,7 @@ struct BookshelfIndex;
 
 class BookshelfManager {
 public:
-    BookshelfManager() = default;
+    BookshelfManager();
     void AddNovel(const std::string& NovelURL);
     void DeleteNovel(const NovelSite& Site, std::string& NovelID);
     void UpdateNovel(const NovelSite& Site, std::string& NovelID);
@@ -26,10 +26,10 @@ public:
     std::string UpdateMailText="";
     std::string WarningMailText="";
 
-    HamelnNovelManager& HamelnMG;
-    NarouNovelManager& NarouMG;
-    NocNovelManager& NocMG;
-    YaruoManager& YaruoMG;
+    HamelnNovelManager* HamelnMG;
+    NarouNovelManager* NarouMG;
+    NocNovelManager* NocMG;
+    YaruoManager* YaruoMG;
  
 private:
 

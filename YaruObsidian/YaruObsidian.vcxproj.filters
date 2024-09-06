@@ -42,6 +42,9 @@
     <ClCompile Include="NovelManager.cpp">
       <Filter>ソース ファイル\NovelManager</Filter>
     </ClCompile>
+    <ClCompile Include="UserInterface.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BookshelfIndex.h">
@@ -67,9 +70,6 @@
     </ClInclude>
     <ClInclude Include="NovelManager.h">
       <Filter>ヘッダー ファイル\NovelManager</Filter>
-    </ClInclude>
-    <ClInclude Include="UserInterface.cpp">
-      <Filter>ソース ファイル</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

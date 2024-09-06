@@ -21,6 +21,14 @@
 
 namespace sstd { class sockSSL; }
 
+BookshelfManager::BookshelfManager():
+	HamelnMG(new HamelnNovelManager()),
+	NarouMG(new NarouNovelManager()),
+	NocMG(new NocNovelManager()),
+	YaruoMG(new YaruoManager())
+{
+}
+
 void BookshelfManager::AddNovel(const std::string& NovelURL)
 {
     BookshelfIndex NewNovel;
@@ -30,7 +38,7 @@ void BookshelfManager::AddNovel(const std::string& NovelURL)
     // Match object to hold the results for the domain
     std::smatch domainMatches;
 
-    NewNovel.NovelTitle = NarouMG.GetTitle(NovelURL);
+    NewNovel.NovelTitle = NarouMG->GetTitle(NovelURL);
 
     NewNovel.ChapterAmount = 0;
     NewNovel.IsUpdateRequired = true;
@@ -48,6 +56,7 @@ void BookshelfManager::AddNovel(const std::string& NovelURL)
                 NarouBooks[NewNovel.NovelID] = NewNovel;
                 std::cout << "New Novel : " << NewNovel.NovelTitle << "\n";
                 SaveBookshelves(NovelSite::Narou);
+                LoadBookshelf(NovelSite::Narou);
                 return;
             }
         }
@@ -61,6 +70,7 @@ void BookshelfManager::AddNovel(const std::string& NovelURL)
                 HamelnBooks[NewNovel.NovelID] = NewNovel;
                 std::cout << "New Novel : " << NewNovel.NovelTitle << "\n";
                 SaveBookshelves(NovelSite::Hameln);
+                LoadBookshelf(NovelSite::Hameln);
                 return;
             }
         }
@@ -73,6 +83,7 @@ void BookshelfManager::AddNovel(const std::string& NovelURL)
                 NocBooks[NewNovel.NovelID] = NewNovel;
                 std::cout << "New Novel : " << NewNovel.NovelTitle << "\n";
                 SaveBookshelves(NovelSite::Noc);
+                LoadBookshelf(NovelSite::Noc);
                 return;
             }
         }
@@ -86,6 +97,7 @@ void BookshelfManager::AddNovel(const std::string& NovelURL)
                 YaruoBooks[NewNovel.NovelID] = NewNovel;
                 std::cout << "New Novel : " << NewNovel.NovelTitle << "\n";
                 SaveBookshelves(NovelSite::Yaruo);
+                LoadBookshelf(NovelSite::Yaruo);
                 return;
             }
         }
@@ -146,17 +158,35 @@ void BookshelfManager::LoadBookshelf(const NovelSite& Site) {
         Bookshelf = &NocBooks;
         filename = "./Bookshelves/Noc.json";
         break;
+    default:
+        Bookshelf = nullptr;
+        break;
     }
-
+    std::cout << "Load:PreOpen\n";
     std::ifstream file(filename);
     if (!file.is_open()) {
-        std::cerr << "Failed to open file: " << filename << std::endl;
+        std::ofstream new_file(filename);
+        new_file.close();
         return;
     }
     file >> json_obj; 
-    file.close();    
-
-    
+    file.close();
+    if(!Bookshelf)
+    {
+        std::cout << "Bookshelf is nullptr\n";
+    }
+    std::cout << "Load:close\n";
+    for (auto it = json_obj.begin(); it != json_obj.end(); ++it) {
+        BookshelfIndex index;
+        index.ChapterAmount = it.value().at("ChapterAmount");
+        index.NovelTitle = it.value().at("NovelTitle");
+        index.Directory = it.value().at("Directory");
+        index.IsUpdateRequired = it.value().at("IsUpdateRequired");
+        index.LastUpdatedDate = it.value().at("LastUpdatedDate");
+        index.NovelID = it.key();
+       ( *Bookshelf)[it.key()] = index;
+    }
+    std::cout << "Load:SetValues\n";
 }
 
 bool BookshelfManager::stringToBool(const std::string& str)
@@ -244,6 +274,8 @@ std::string BookshelfManager::GetCSVFile(const NovelSite& Site)
 		break;
 	}
     return filename;
+
+
 }
 
 void BookshelfManager::SaveBookshelves(const NovelSite& Site)
@@ -270,19 +302,22 @@ void BookshelfManager::SaveBookshelves(const NovelSite& Site)
         Bookshelf = &NocBooks;
         filename = "./Bookshelves/Noc.json";
         break;
+    default:
+    	Bookshelf = nullptr;
+    	break;
+
     }
 
     for(const auto& NovelIndex:*Bookshelf)
     {
         json_obj[NovelIndex.first]["ChapterAmount"] = NovelIndex.second.ChapterAmount;
-        json_obj[NovelIndex.first]["LastUpdatedData"] = NovelIndex.second.LastUpdatedDate;
+        json_obj[NovelIndex.first]["LastUpdatedDate"] = NovelIndex.second.LastUpdatedDate;
         json_obj[NovelIndex.first]["NovelTitle"] = NovelIndex.second.NovelTitle;
         json_obj[NovelIndex.first]["Directory"] = NovelIndex.second.Directory;
         json_obj[NovelIndex.first]["IsUpdateRequired"] = NovelIndex.second.IsUpdateRequired;
     }
-
     std::ofstream JsonFile(filename);
-    JsonFile << json_obj;
+    JsonFile << std::setw(4) << json_obj;
     JsonFile.close();
 }
 
