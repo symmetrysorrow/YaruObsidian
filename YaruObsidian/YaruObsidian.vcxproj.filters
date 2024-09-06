@@ -27,9 +27,6 @@
     <ClCompile Include="BookshelfManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="NovelManager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="HamelnNovelManager.cpp">
       <Filter>ソース ファイル\NovelManager</Filter>
     </ClCompile>
@@ -42,15 +39,15 @@
     <ClCompile Include="YaruoManager.cpp">
       <Filter>ソース ファイル\NovelManager</Filter>
     </ClCompile>
+    <ClCompile Include="NovelManager.cpp">
+      <Filter>ソース ファイル\NovelManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BookshelfIndex.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="BookshelfManager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="NovelManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="HamelnNovelManager.h">
@@ -64,6 +61,15 @@
     </ClInclude>
     <ClInclude Include="YaruoManager.h">
       <Filter>ヘッダー ファイル\NovelManager</Filter>
+    </ClInclude>
+    <ClInclude Include="UserInterface.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="NovelManager.h">
+      <Filter>ヘッダー ファイル\NovelManager</Filter>
+    </ClInclude>
+    <ClInclude Include="UserInterface.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

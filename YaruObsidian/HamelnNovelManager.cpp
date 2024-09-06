@@ -33,7 +33,7 @@ void HamelnNovelManager::UpdateNovel(const int& ChapterAmount)
         file << ChapterContents << "\n";
         file.close();
 
-        CreateChapter(ChapterTitle, ChapterContents, NovelType::Hameln);
+        CreateChapter(ChapterTitle, ChapterContents, NovelSite::Hameln);
         PreChapterTitle = ChapterTitle;
 
         //進捗率の計算と表示

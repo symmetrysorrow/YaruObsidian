@@ -21,7 +21,7 @@ void NovelManager::ManageNovel(BookshelfIndex const Index)
     outfile.close();
 }
 #if 1
-void NovelManager::CreateChapter(const std::string& ChapterTitle, const std::string& ChapterContents, NovelType novelSite) 
+void NovelManager::CreateChapter(const std::string& ChapterTitle, const std::string& ChapterContents, NovelSite novelSite) 
 {
     std::string ChapterPath, PreChapterPath, chapterTitle,preChapterTitle;
 

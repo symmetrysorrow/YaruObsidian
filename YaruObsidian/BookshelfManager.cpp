@@ -5,6 +5,7 @@
 #include "NocNovelManager.h"
 #include "YaruoManager.h"
 #include "BookshelfManager.h"
+#include "BookshelfIndex.h"
 
 #include <algorithm>
 #include <locale>
@@ -15,81 +16,154 @@
 #include <sstream>
 #include <Windows.h>
 //#include <winhttp.h>
+#include<nlohmann/json.hpp>
 #include <cstdlib>
 
 namespace sstd { class sockSSL; }
 
+void BookshelfManager::AddNovel(const std::string& NovelURL)
+{
+    BookshelfIndex NewNovel;
+    // Regular expression to capture the domain part
+    std::regex domainPattern(R"(https://([^/]+)/)");
+
+    // Match object to hold the results for the domain
+    std::smatch domainMatches;
+
+    NewNovel.NovelTitle = NarouMG.GetTitle(NovelURL);
+
+    NewNovel.ChapterAmount = 0;
+    NewNovel.IsUpdateRequired = true;
+    NewNovel.LastUpdatedDate = "Today";
+
+    if (regex_search(NovelURL, domainMatches, domainPattern) && domainMatches.size() == 2) {
+        std::string domain = domainMatches[1].str();
+
+        if (domain == "ncode.syosetu.com") {
+            std::regex ncodePattern(R"(https://ncode.syosetu.com/([^/]+)/)");
+            std::smatch ncodeMatches;
+
+            if (regex_search(NovelURL, ncodeMatches, ncodePattern) && ncodeMatches.size() == 2) {
+                NewNovel.NovelID = ncodeMatches[1].str();
+                NarouBooks[NewNovel.NovelID] = NewNovel;
+                std::cout << "New Novel : " << NewNovel.NovelTitle << "\n";
+                SaveBookshelves(NovelSite::Narou);
+                return;
+            }
+        }
+
+        if (domain == "syosetu.org") {
+            std::regex HamPattern(R"(https://syosetu.org/novel/([^/]+)/)");
+            std::smatch HamMatches;
+
+            if (regex_search(NovelURL, HamMatches, HamPattern) && HamMatches.size() == 2) {
+                NewNovel.NovelID = HamMatches[1].str();
+                HamelnBooks[NewNovel.NovelID] = NewNovel;
+                std::cout << "New Novel : " << NewNovel.NovelTitle << "\n";
+                SaveBookshelves(NovelSite::Hameln);
+                return;
+            }
+        }
+        if (domain == "novel18.syosetu.com") {
+            std::regex NocPattern(R"(https://novel18.syosetu.com/([^/]+)/)");
+            std::smatch NocMatches;
+
+            if (regex_search(NovelURL, NocMatches, NocPattern) && NocMatches.size() == 2) {
+                NewNovel.NovelID = NocMatches[1].str();
+                NocBooks[NewNovel.NovelID] = NewNovel;
+                std::cout << "New Novel : " << NewNovel.NovelTitle << "\n";
+                SaveBookshelves(NovelSite::Noc);
+                return;
+            }
+        }
+        if (domain == "rss.r401.net")
+        {
+            std::regex YaruoPattern(R"(https://rss.r401.net/yaruo/categories/([^/]+))");
+            std::smatch YaruoMatches;
+
+            if (regex_search(NovelURL, YaruoMatches, YaruoPattern) && YaruoMatches.size() == 2) {
+                NewNovel.NovelID = YaruoMatches[1].str();
+                YaruoBooks[NewNovel.NovelID] = NewNovel;
+                std::cout << "New Novel : " << NewNovel.NovelTitle << "\n";
+                SaveBookshelves(NovelSite::Yaruo);
+                return;
+            }
+        }
+    }
+    std::cout << "Invalid URL\n";
+}
+
+void BookshelfManager::DeleteNovel(const NovelSite& Site, std::string& NovelID)
+{
+}
+
+void BookshelfManager::UpdateNovel(const NovelSite& Site, std::string& NovelID)
+{
+}
+
+void BookshelfManager::MoveNovel(const NovelSite& Site, std::string& NovelID)
+{
+}
+
 void BookshelfManager::ManageBookshelf()
 {
-    GetMailInfo();
     std::cout << "Loading Bookshelves...\n";
-    LoadBookshelf("Narou.csv");
-    LoadBookshelf("Noc.csv");
-    LoadBookshelf("Hameln.csv");
-    LoadBookshelf("Yaruo.csv");
+    LoadBookshelf(NovelSite::Hameln);
+    LoadBookshelf(NovelSite::Narou);
+    LoadBookshelf(NovelSite::Yaruo);
+    LoadBookshelf(NovelSite::Noc);
     std::cout << "Bookshelves Loading Finished\n";
     UpdateNovels();
     SendNotification();
     SendWarning();
 }
 
-void BookshelfManager::LoadBookshelf(std::string filename) {
+void BookshelfManager::OrganizeNovel(const NovelSite& Site, std::string& NovelID)
+{
+}
 
-    std::ifstream file("Bookshelves/" + filename);
+void BookshelfManager::LoadBookshelf(const NovelSite& Site) {
+
+    nlohmann::ordered_json json_obj;
+    std::string filename;
+    std::map<std::string, BookshelfIndex>* Bookshelf;
+
+    switch (Site)
+    {
+    case::Hameln:
+        Bookshelf = &HamelnBooks;
+        filename = "./Bookshelves/Hameln.json";
+        break;
+    case::Narou:
+        Bookshelf = &NarouBooks;
+        filename = "./Bookshelves/Narou.json";
+        break;
+    case::Yaruo:
+        Bookshelf = &YaruoBooks;
+        filename = "./Bookshelves/Yaruo.json";
+        break;
+    case::Noc:
+        Bookshelf = &NocBooks;
+        filename = "./Bookshelves/Noc.json";
+        break;
+    }
+
+    std::ifstream file(filename);
     if (!file.is_open()) {
         std::cerr << "Failed to open file: " << filename << std::endl;
         return;
     }
+    file >> json_obj; 
+    file.close();    
 
-    std::string line;
-    while (getline(file, line)) {
-        std::vector<std::string> tokens;
-        size_t pos = 0;
-        std::string token;
-        while ((pos = line.find(',')) != std::string::npos) {
-            token = line.substr(0, pos);
-            tokens.push_back(token);
-            line.erase(0, pos + 1);
-        }
-        tokens.push_back(line);
+    
+}
 
-        if (tokens.size() != 3) {
-            std::cerr << "Invalid line: " << line << std::endl;
-            continue;
-        }
-
-        BookshelfIndex bookshelf;
-        bookshelf.NovelID = tokens[0];
-        bookshelf.ChapterAmount = stoi(tokens[1]);
-        bookshelf.LastUpdatedDate = tokens[2];
-
-        if (filename == "Narou.csv")
-        {
-            NarouBookshelves.push_back(bookshelf);
-
-        }
-        if (filename == "Hameln.csv")
-        {
-            HamelnBookshelves.push_back(bookshelf);
-        }
-        if (filename == "Noc.csv")
-        {
-            NocBookshelves.push_back(bookshelf);
-        }
-        if (filename == "Yaruo.csv")
-        {
-            YaruoBookshelves.push_back(bookshelf);
-        }
-        
-    }
-    file.close();
-
-    std::ofstream ofs("Bookshelves/" + filename, std::ofstream::out | std::ofstream::trunc);
-    if (!ofs.is_open()) {
-        std::cerr << "Failed to open file for truncating: " << filename << std::endl;
-        return;
-    }
-    ofs.close();
+bool BookshelfManager::stringToBool(const std::string& str)
+{
+    std::string lower_str = str;
+    std::transform(lower_str.begin(), lower_str.end(), lower_str.begin(), ::tolower); // 小文字に変換
+    return (lower_str == "true");
 }
 
 void BookshelfManager::AppendToBookshelf(const std::string& filename, const std::string& data)
@@ -150,15 +224,78 @@ void BookshelfManager::UpdateNovels()
     }
 }
 
+std::string BookshelfManager::GetCSVFile(const NovelSite& Site)
+{
+   
+	std::string filename;
+	switch (Site)
+	{
+	case::Hameln:
+		filename = "Hameln.csv";
+		break;
+	case::Narou:
+		filename = "Narou.csv";
+		break;
+	case::Noc:
+		filename = "Noc.csv";
+		break;
+	case::Yaruo:
+		filename = "yaruo.csv";
+		break;
+	}
+    return filename;
+}
+
+void BookshelfManager::SaveBookshelves(const NovelSite& Site)
+{
+    nlohmann::ordered_json json_obj;
+    std::string filename;
+    std::map<std::string, BookshelfIndex>* Bookshelf;
+
+    switch(Site)
+    {
+    case::Hameln:
+        Bookshelf = &HamelnBooks;
+        filename = "./Bookshelves/Hameln.json";
+        break;
+    case::Narou:
+        Bookshelf = &NarouBooks;
+        filename = "./Bookshelves/Narou.json";
+        break;
+    case::Yaruo:
+        Bookshelf = &YaruoBooks;
+        filename = "./Bookshelves/Yaruo.json";
+        break;
+    case::Noc:
+        Bookshelf = &NocBooks;
+        filename = "./Bookshelves/Noc.json";
+        break;
+    }
+
+    for(const auto& NovelIndex:*Bookshelf)
+    {
+        json_obj[NovelIndex.first]["ChapterAmount"] = NovelIndex.second.ChapterAmount;
+        json_obj[NovelIndex.first]["LastUpdatedData"] = NovelIndex.second.LastUpdatedDate;
+        json_obj[NovelIndex.first]["NovelTitle"] = NovelIndex.second.NovelTitle;
+        json_obj[NovelIndex.first]["Directory"] = NovelIndex.second.Directory;
+        json_obj[NovelIndex.first]["IsUpdateRequired"] = NovelIndex.second.IsUpdateRequired;
+    }
+
+    std::ofstream JsonFile(filename);
+    JsonFile << json_obj;
+    JsonFile.close();
+}
+
+
 void BookshelfManager::GetMailInfo()
 {
 
-    std::vector<std::string> lines = get_mail_first_lines();
+    std::vector<std::string> NovelURLs = get_mail_first_NovelURLs();
 
     std::regex URL(R"(https://)");
 
-    // Print the lines
-    for (const auto& line : lines) {
+    // Print the NovelURLs
+    for (const auto& NovelURL : NovelURLs) {
 
         // Regular expression to capture the domain part
         std::regex domainPattern(R"(https://([^/]+)/)");
@@ -166,7 +303,7 @@ void BookshelfManager::GetMailInfo()
         // Match object to hold the results for the domain
         std::smatch domainMatches;
 
-        if (regex_search(line, domainMatches, domainPattern) && domainMatches.size() == 2) {
+        if (regex_search(NovelURL, domainMatches, domainPattern) && domainMatches.size() == 2) {
             std::string domain = domainMatches[1].str();
 
             if (domain == "ncode.syosetu.com") {
@@ -174,7 +311,7 @@ void BookshelfManager::GetMailInfo()
                 std::regex ncodePattern(R"(https://ncode.syosetu.com/([^/]+)/)");
                 std::smatch ncodeMatches;
 
-                if (regex_search(line, ncodeMatches, ncodePattern) && ncodeMatches.size() == 2) {
+                if (regex_search(NovelURL, ncodeMatches, ncodePattern) && ncodeMatches.size() == 2) {
                     std::string ncode = ncodeMatches[1].str();
                     AppendToBookshelf("Narou.csv", ncode + ",1,1");
                     std::cout << "New Novel : " << ncode<<"\n";
@@ -186,7 +323,7 @@ void BookshelfManager::GetMailInfo()
                 std::regex HamPattern(R"(https://syosetu.org/novel/([^/]+)/)");
                 std::smatch HamMatches;
 
-                if (regex_search(line, HamMatches, HamPattern) && HamMatches.size() == 2) {
+                if (regex_search(NovelURL, HamMatches, HamPattern) && HamMatches.size() == 2) {
                     std::string HamID = HamMatches[1].str();
                     AppendToBookshelf("Hameln.csv", HamID + ",1,1");
                     std::cout << "New Novel : " << HamID << "\n";
@@ -197,7 +334,7 @@ void BookshelfManager::GetMailInfo()
                 std::regex NocPattern(R"(https://novel18.syosetu.com/([^/]+)/)");
                 std::smatch NocMatches;
 
-                if (regex_search(line, NocMatches, NocPattern) && NocMatches.size() == 2) {
+                if (regex_search(NovelURL, NocMatches, NocPattern) && NocMatches.size() == 2) {
                     std::string NocCode = NocMatches[1].str();
                     AppendToBookshelf("Noc.csv", NocCode + ",1,1");
                     std::cout << "New Novel : " << NocCode << "\n";
@@ -209,7 +346,7 @@ void BookshelfManager::GetMailInfo()
                 std::regex YaruoPattern(R"(https://rss.r401.net/yaruo/categories/([^/]+))");
                 std::smatch YaruoMatches;
 
-                if (regex_search(line, YaruoMatches, YaruoPattern) && YaruoMatches.size() == 2) {
+                if (regex_search(NovelURL, YaruoMatches, YaruoPattern) && YaruoMatches.size() == 2) {
                     std:: string YaruoCode = YaruoMatches[1].str();
                     AppendToBookshelf("Yaruo.csv", YaruoCode + ",1,1");
                     std::cout << "New Novel : " << YaruoCode << "\n";
@@ -220,7 +357,7 @@ void BookshelfManager::GetMailInfo()
     }
 }
 
-std::vector<std::string> BookshelfManager::get_mail_first_lines()
+std::vector<std::string> BookshelfManager::get_mail_first_NovelURLs()
 {
         std::vector<std::string> result;
 
@@ -243,7 +380,7 @@ std::vector<std::string> BookshelfManager::get_mail_first_lines()
 
         if (pModule != nullptr) {
             // Get the function from the module
-            PyObject* pFunc = PyObject_GetAttrString(pModule, "get_mail_first_lines");
+            PyObject* pFunc = PyObject_GetAttrString(pModule, "get_mail_first_NovelURLs");
 
             if (pFunc && PyCallable_Check(pFunc)) {
                 // Call the function
@@ -269,12 +406,12 @@ std::vector<std::string> BookshelfManager::get_mail_first_lines()
                 }
                 else {
                     PyErr_Print();
-                    std::cerr << "Call to get_mail_first_lines failed" << std::endl;
+                    std::cerr << "Call to get_mail_first_NovelURLs failed" << std::endl;
                 }
             }
             else {
                 PyErr_Print();
-                std::cerr << "Cannot find function get_mail_first_lines" << std::endl;
+                std::cerr << "Cannot find function get_mail_first_NovelURLs" << std::endl;
             }
             Py_XDECREF(pFunc);
             Py_DECREF(pModule);

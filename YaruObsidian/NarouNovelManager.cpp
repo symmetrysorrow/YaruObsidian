@@ -31,7 +31,7 @@ void NarouNovelManager::UpdateNovel(const int& ChapterAmount)
             ChapterContents = ContentMatches[1].str();
         }
 
-        CreateChapter(ChapterTitle, ChapterContents, NovelType::Narou);
+        CreateChapter(ChapterTitle, ChapterContents, NovelSite::Narou);
         PreChapterTitle = ChapterTitle;
        
         //進捗率の計算と表示

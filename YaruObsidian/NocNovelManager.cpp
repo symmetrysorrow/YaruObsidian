@@ -31,7 +31,7 @@ void NocNovelManager::UpdateNovel(const int& ChapterAmount)
             ChapterContents=ContentMatches[1].str();
         }
 
-        CreateChapter(ChapterTitle, ChapterContents, NovelType::Noc);
+        CreateChapter(ChapterTitle, ChapterContents, NovelSite::Noc);
         PreChapterTitle = ChapterTitle;
 
         //進捗率の計算と表示

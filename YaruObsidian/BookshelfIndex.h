@@ -5,6 +5,9 @@ struct BookshelfIndex {
     std::string NovelID;
     int ChapterAmount;
     std::string LastUpdatedDate;
+    std::string NovelTitle;
+    std::string Directory;
+    bool IsUpdateRequired;
 
     bool operator==(const BookshelfIndex& Other)const
     {
@@ -16,9 +19,11 @@ struct BookshelfIndex {
     }
 };
 
-enum NovelType {
+enum NovelSite {
     Narou,
     Hameln,
     Noc,
     Yaruo,
 };
+
+

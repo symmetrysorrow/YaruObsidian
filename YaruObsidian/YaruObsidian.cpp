@@ -10,8 +10,7 @@
 int main() {
     // Create and manage BookshelfManager
     {
-        BookshelfManager manager;
-        manager.ManageBookshelf();
+        
         std::cout << "Completed\n";
     } // manager goes out of scope and is destructed here
 

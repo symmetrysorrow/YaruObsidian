@@ -267,7 +267,7 @@ void YaruoManager::UpdateNovel(const int& CharacterAmount)
             ChapterTitle = decode_html_entities(removeSubstring(ChapterTitle, "やる夫スレ本棚  _  "));
             ChapterTitle = removeBracketsContent( removeSubstring(ChapterTitle, NovelTitle));
             
-            CreateChapter(ChapterTitle, ChapterContents, NovelType::Yaruo);
+            CreateChapter(ChapterTitle, ChapterContents, NovelSite::Yaruo);
             PreChapterTitle = ChapterTitle;
 
             //進捗率の計算と表示

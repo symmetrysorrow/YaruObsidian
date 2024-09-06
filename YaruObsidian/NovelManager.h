@@ -19,7 +19,7 @@ public:
 	NovelManager();
 	void ManageNovel(BookshelfIndex Index);
 	BookshelfManager* BookshelfManagerPtr;
-
+	std::string GetTitle(std::string URL);
 protected:
 	BookshelfIndex NovelIndex;
 	std::string InfoURL;
@@ -28,9 +28,9 @@ protected:
 	std::string NovelTitle;
 	std::string LastChapterPath;
 
-	void CreateChapter(const std::string& ChapterTitle, const std::string& ChapterContents, NovelType novelSite);
+	void CreateChapter(const std::string& ChapterTitle, const std::string& ChapterContents, NovelSite novelSite);
 	virtual std::string GetHTML(const std::string& URL);
-	std::string GetTitle(std::string URL);
+	
 	std::string GetHTMLTitle(const std::string& HTML);
 	std::string RemoveNewLines(const std::string& str);
 	void SetCookie(const std::string& url, const std::string& cookie);
