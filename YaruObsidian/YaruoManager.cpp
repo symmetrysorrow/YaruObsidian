@@ -168,9 +168,9 @@ void YaruoManager::UpdateNovel(const int& CharacterAmount)
 
         ChapterAm = LinkList.size();        
 
-        if (ChapterAm < NovelIndex.ChapterAmount)
+        if (ChapterAm < NovelIndex->ChapterAmount)
         {
-            std::cout << ChapterAm <<"<<"<<NovelIndex.ChapterAmount;
+            std::cout << ChapterAm <<"<<"<<NovelIndex->ChapterAmount;
             std::cout << "\nWarning : Chapter is decreased\n";
             return;
         }
@@ -178,7 +178,6 @@ void YaruoManager::UpdateNovel(const int& CharacterAmount)
         std::string Target = LinkList[1];
         int i = 1;
         std::cout << "Updating Novel : " + NovelTitle + "\n";
-        BookshelfManagerPtr->UpdateMailText += (NovelTitle + "　");
 
         for (auto& Link : std::vector<std::string>(LinkList.rbegin(), LinkList.rend()))
         {
@@ -282,7 +281,7 @@ void YaruoManager::UpdateNovel(const int& CharacterAmount)
 
 void YaruoManager::GetNovelInfo()
 {
-    InfoURL = "https://rss.r401.net/yaruo/categories/" + NovelIndex.NovelID;
+    InfoURL = "https://rss.r401.net/yaruo/categories/" + NovelIndex->NovelID;
 
     NovelInfoHTML = RemoveNewLines(GetHTML(InfoURL));
     NovelTitle = removeSubstring(GetHTMLTitle(NovelInfoHTML), " | やる夫RSS+インデックス");
@@ -293,18 +292,15 @@ void YaruoManager::GetNovelInfo()
 
     if (regex_search(NovelInfoHTML, DateMatches, DatePattern))
     {
-        if (DateMatches[1].str() != NovelIndex.LastUpdatedDate)
+        if (DateMatches[1].str() != NovelIndex->LastUpdatedDate)
         {
-            UpdateNovel(NovelIndex.ChapterAmount);
-            BookshelfManagerPtr->AppendToBookshelf("Yaruo.csv", NovelIndex.NovelID + "," + std::to_string(ChapterAm) + "," + DateMatches[1].str());
+            UpdateNovel(NovelIndex->ChapterAmount);
             return;
         }
-        BookshelfManagerPtr->AppendToBookshelf("Yaruo.csv", NovelIndex.NovelID + "," + std::to_string(NovelIndex.ChapterAmount) + "," + DateMatches[1].str());
         std::cout << "No Need To Update " + NovelTitle + "\n";
         return;
     }
     std::cout << "Error. Novel Is not Found\n";
-    BookshelfManagerPtr->AppendToBookshelf("Yaruo.csv", NovelIndex.NovelID + "," + std::to_string(NovelIndex.ChapterAmount) + "," + NovelIndex.LastUpdatedDate);
     return;
 }
 

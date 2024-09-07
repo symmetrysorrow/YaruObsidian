@@ -21,11 +21,11 @@
 
 namespace sstd { class sockSSL; }
 
-BookshelfManager::BookshelfManager():
-	HamelnMG(new HamelnNovelManager()),
-	NarouMG(new NarouNovelManager()),
-	NocMG(new NocNovelManager()),
-	YaruoMG(new YaruoManager())
+BookshelfManager::BookshelfManager()
+	//:HamelnMG(new HamelnNovelManager()),
+	//NarouMG(new NarouNovelManager()),
+	//NocMG(new NocNovelManager()),
+	//YaruoMG(new YaruoManager())
 {
 }
 
@@ -38,8 +38,6 @@ void BookshelfManager::AddNovel(const std::string& NovelURL)
     // Match object to hold the results for the domain
     std::smatch domainMatches;
 
-    NewNovel.NovelTitle = NarouMG->GetTitle(NovelURL);
-
     NewNovel.ChapterAmount = 0;
     NewNovel.IsUpdateRequired = true;
     NewNovel.LastUpdatedDate = "Today";
@@ -50,11 +48,14 @@ void BookshelfManager::AddNovel(const std::string& NovelURL)
         if (domain == "ncode.syosetu.com") {
             std::regex ncodePattern(R"(https://ncode.syosetu.com/([^/]+)/)");
             std::smatch ncodeMatches;
-
             if (regex_search(NovelURL, ncodeMatches, ncodePattern) && ncodeMatches.size() == 2) {
                 NewNovel.NovelID = ncodeMatches[1].str();
                 NewNovel.Directory = "Novel/Narou";
                 NarouBooks[NewNovel.NovelID] = NewNovel;
+                NarouNovelManager* NarouMngr = new NarouNovelManager();
+                NarouMngr->NovelIndex = &NewNovel;
+                NarouMngr->GetNovelInfo();
+                std::cout << "flag1\n";
                 std::cout << "New Novel : " << NewNovel.NovelTitle << "\n";
                 SaveBookshelves(NovelSite::Narou);
                 LoadBookshelf(NovelSite::Narou);
@@ -115,6 +116,17 @@ void BookshelfManager::DeleteNovel(const NovelSite& Site, std::string& NovelID)
 
 void BookshelfManager::UpdateNovel(const NovelSite& Site, std::string& NovelID)
 {
+}
+
+void BookshelfManager::UpdateAll(const NovelSite& Site)
+{
+    std::map<std::string, BookshelfIndex>* Bookshelf = GetBookshelf(Site);
+
+    for (const std::pair<const std::string, BookshelfIndex>& index : *Bookshelf) {
+        NarouNovelManager* NarouMngr = new NarouNovelManager();
+        NarouMngr->NovelIndex = const_cast<BookshelfIndex*>(&index.second);
+        
+    }
 }
 
 void BookshelfManager::MoveNovel(const NovelSite& Site, std::string& NovelID)
@@ -190,6 +202,30 @@ void BookshelfManager::LoadBookshelf(const NovelSite& Site) {
     }
 }
 
+void BookshelfManager::AddNovelInfo(const NovelSite& Site, const BookshelfIndex& Index)
+{
+    std::map<std::string, BookshelfIndex>* Bookshelf;
+    switch(Site)
+    {
+    case::Hameln:
+        Bookshelf = &HamelnBooks;
+        break;
+    case::Yaruo:
+        Bookshelf = &YaruoBooks;
+        break;
+    case::Narou:
+        Bookshelf = &NarouBooks;
+        break;
+    case::Noc:
+        Bookshelf = &NocBooks;
+        break;
+    default:
+    	Bookshelf = nullptr;
+    }
+
+    (*Bookshelf)[Index.NovelID] = Index;
+}
+
 bool BookshelfManager::stringToBool(const std::string& str)
 {
     std::string lower_str = str;
@@ -227,32 +263,6 @@ void BookshelfManager::UpdateNovels()
     std::sort(YaruoBookshelves.begin(), YaruoBookshelves.end());
     auto Yit = std::unique(YaruoBookshelves.begin(), YaruoBookshelves.end());
     YaruoBookshelves.erase(Yit, YaruoBookshelves.end());
-    
-
-    for (const auto& bookshelfIndex : NarouBookshelves) {
-        NarouNovelManager* NarouManager = new NarouNovelManager;
-        NarouManager->BookshelfManagerPtr = this;
-        NarouManager->ManageNovel(bookshelfIndex);
-        delete NarouManager;
-    }
-    for (const auto& bookshelfIndex : HamelnBookshelves) {
-        HamelnNovelManager* Hamelnmanager = new HamelnNovelManager;
-        Hamelnmanager->BookshelfManagerPtr = this;
-        Hamelnmanager->ManageNovel(bookshelfIndex);
-        delete Hamelnmanager;
-    }
-    for (const auto& bookshelfIndex : NocBookshelves) {
-        NocNovelManager* NocManager = new NocNovelManager;
-        NocManager->BookshelfManagerPtr = this;
-        NocManager->ManageNovel(bookshelfIndex);
-        delete NocManager;
-    }
-    for (const auto& bookshelfIndex : YaruoBookshelves) {
-        YaruoManager* YaruManager = new YaruoManager;
-        YaruManager->BookshelfManagerPtr = this;
-        YaruManager->ManageNovel(bookshelfIndex);
-        delete YaruManager;
-    }
 }
 
 std::string BookshelfManager::GetCSVFile(const NovelSite& Site)
@@ -279,35 +289,61 @@ std::string BookshelfManager::GetCSVFile(const NovelSite& Site)
 
 }
 
-void BookshelfManager::SaveBookshelves(const NovelSite& Site)
+std::map<std::string, BookshelfIndex>* BookshelfManager::GetBookshelf(const NovelSite& Site)
 {
-    nlohmann::ordered_json json_obj;
-    std::string filename;
     std::map<std::string, BookshelfIndex>* Bookshelf;
 
-    switch(Site)
+    switch (Site)
     {
     case::Hameln:
         Bookshelf = &HamelnBooks;
-        filename = "./.Bookshelves/Hameln.json";
         break;
     case::Narou:
         Bookshelf = &NarouBooks;
-        filename = "./.Bookshelves/Narou.json";
         break;
     case::Yaruo:
         Bookshelf = &YaruoBooks;
-        filename = "./.Bookshelves/Yaruo.json";
         break;
     case::Noc:
         Bookshelf = &NocBooks;
+        break;
+    default:
+        Bookshelf = nullptr;
+        break;
+    }
+
+    return Bookshelf;
+}
+
+std::string BookshelfManager::GetJsonPath(const NovelSite& Site)
+{
+    std::string filename;
+    switch (Site)
+    {
+    case::Hameln:
+        filename = "./.Bookshelves/Hameln.json";
+        break;
+    case::Narou:
+        filename = "./.Bookshelves/Narou.json";
+        break;
+    case::Yaruo:
+        filename = "./.Bookshelves/Yaruo.json";
+        break;
+    case::Noc:
         filename = "./.Bookshelves/Noc.json";
         break;
     default:
-    	Bookshelf = nullptr;
-    	break;
-
+        filename = "";
+        break;
     }
+    return filename;
+}
+
+void BookshelfManager::SaveBookshelves(const NovelSite& Site)
+{
+    nlohmann::ordered_json json_obj;
+    std::string filename=GetJsonPath(Site);
+    std::map<std::string, BookshelfIndex>* Bookshelf=GetBookshelf(Site);
 
     for(const auto& NovelIndex:*Bookshelf)
     {

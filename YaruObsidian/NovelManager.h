@@ -16,12 +16,11 @@ class BookshelfManager;
 
 class NovelManager {
 public:
-	NovelManager();
 	void ManageNovel(BookshelfIndex Index);
-	BookshelfManager* BookshelfManagerPtr;
 	std::string GetTitle(std::string URL);
+	BookshelfIndex* NovelIndex;
+	virtual void GetNovelInfo();
 protected:
-	BookshelfIndex NovelIndex;
 	std::string InfoURL;
 	std::string NovelURL;
 	std::string PreChapterTitle="";
@@ -41,5 +40,5 @@ protected:
 
 	virtual void UpdateNovel(const int& ChapterAmount);
 	virtual void UpdateShort();
-	virtual void GetNovelInfo();
+	
 };

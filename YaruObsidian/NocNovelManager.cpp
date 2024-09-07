@@ -9,7 +9,6 @@ void NocNovelManager::UpdateNovel(const int& ChapterAmount)
     std::filesystem::create_directories(path);
 
     std::cout << "Updating Novel : " + NovelTitle + "\n";
-    BookshelfManagerPtr->UpdateMailText += (NovelTitle + "　");
 
     for (int i = 1; i <= ChapterAmount; i++)
     {
@@ -47,8 +46,8 @@ void NocNovelManager::UpdateNovel(const int& ChapterAmount)
 
 void NocNovelManager::GetNovelInfo()
 {
-    InfoURL = "https://novel18.syosetu.com/novelview/infotop/ncode/" + NovelIndex.NovelID + "/";
-    NovelURL = "https://novel18.syosetu.com/" + NovelIndex.NovelID + "/";
+    InfoURL = "https://novel18.syosetu.com/novelview/infotop/ncode/" + NovelIndex->NovelID + "/";
+    NovelURL = "https://novel18.syosetu.com/" + NovelIndex->NovelID + "/";
     std::string NovelInfoHTML = RemoveNewLines(GetHTML(InfoURL));
 
     NovelTitle = GetTitle(NovelURL);
@@ -57,14 +56,13 @@ void NocNovelManager::GetNovelInfo()
     std::smatch DateMatches;
     if (regex_search(NovelInfoHTML, DateMatches, DatePattern))
     {
-        if (DateMatches[1].str() != NovelIndex.LastUpdatedDate)
+        if (DateMatches[1].str() != NovelIndex->LastUpdatedDate)
         {
 	        std::regex pattern(R"(全(\d+)エピソード<a)");
 	        std::smatch matches;
-            if (regex_search(NovelInfoHTML, matches, pattern) && stoi(matches[1].str()) >= NovelIndex.ChapterAmount)
+            if (regex_search(NovelInfoHTML, matches, pattern) && stoi(matches[1].str()) >= NovelIndex->ChapterAmount)
             {
                 UpdateNovel(stoi(matches[1].str()));
-                BookshelfManagerPtr->AppendToBookshelf("Noc.csv", NovelIndex.NovelID + "," + matches[1].str() + "," + DateMatches[1].str());
                 return;
             }
             if (!regex_search(NovelInfoHTML, matches, pattern))
@@ -73,7 +71,6 @@ void NocNovelManager::GetNovelInfo()
 	            return;
             }
         }
-        BookshelfManagerPtr->AppendToBookshelf("Noc.csv", NovelIndex.NovelID + "," + std::to_string(NovelIndex.ChapterAmount) + "," + DateMatches[1].str());
         std::cout << "No Need To Update " + NovelTitle + "\n";
         return;
     }
@@ -84,7 +81,6 @@ void NocNovelManager::GetNovelInfo()
         UpdateShort();
         return;
     }
-    BookshelfManagerPtr->AppendToBookshelf("Noc.csv", NovelIndex.NovelID + ",1,1");
     std::cout << "Error. Novel Is not Found";
     return;
 }

@@ -5,11 +5,10 @@
 void NarouNovelManager::UpdateNovel(const int& ChapterAmount)
 {
     
-    std::filesystem::path path = "Novel/Narou/" + NovelTitle;
+    std::filesystem::path path = NovelIndex->Directory+"/" + NovelIndex->NovelTitle;
     std::filesystem::create_directories(path); 
 
-    std::cout << "Updating Novel : " + NovelTitle + "\n";
-    BookshelfManagerPtr->UpdateMailText += (NovelTitle + "　");
+    std::cout << "Updating Novel : " + NovelIndex->NovelTitle + "\n";
 
     for (int i = 1; i <= ChapterAmount; i++)
     {
@@ -75,26 +74,28 @@ void NarouNovelManager::UpdateShort()
     return;
 }
 
+
+
 void NarouNovelManager::GetNovelInfo()
 {
-    InfoURL = "https://ncode.syosetu.com/novelview/infotop/ncode/" + NovelIndex.NovelID + "/";
-    NovelURL = "https://ncode.syosetu.com/" + NovelIndex.NovelID + "/";
+    InfoURL = "https://ncode.syosetu.com/novelview/infotop/ncode/" + NovelIndex->NovelID + "/";
+    NovelURL = "https://ncode.syosetu.com/" + NovelIndex->NovelID + "/";
     std::string NovelInfoHTML = GetHTML(InfoURL);
-
-    NovelTitle = GetTitle(NovelURL);
-
+    NovelIndex->NovelTitle = GetTitle(NovelURL);
     std::regex DatePattern(R"(<th>最.*掲載日</th>\s*<td>(.*?)<\/td>)", std::regex_constants::icase);
     std::smatch DateMatches;
     if (regex_search(NovelInfoHTML, DateMatches, DatePattern))
     {
-        if (DateMatches[1].str() != NovelIndex.LastUpdatedDate)
+        if (DateMatches[1].str() != NovelIndex->LastUpdatedDate)
         {
+            NovelIndex->LastUpdatedDate = DateMatches[1].str();
+
             std::regex pattern(R"(</span>全(\d+)エピソード)");
             std::smatch matches;
-            if (regex_search(NovelInfoHTML, matches, pattern) && stoi(matches[1].str()) >= NovelIndex.ChapterAmount)
+            if (regex_search(NovelInfoHTML, matches, pattern) && stoi(matches[1].str()) >= NovelIndex->ChapterAmount)
             {
                 UpdateNovel(stoi(matches[1].str()));
-                BookshelfManagerPtr->AppendToBookshelf("Narou.csv", NovelIndex.NovelID + "," + matches[1].str() + "," + DateMatches[1].str());
+                NovelIndex->ChapterAmount = stoi(matches[1].str());
                 return;
             }
             if (!regex_search(NovelInfoHTML, matches, pattern))
@@ -103,8 +104,6 @@ void NarouNovelManager::GetNovelInfo()
                 return;
             }
         }
-        BookshelfManagerPtr->AppendToBookshelf("Narou.csv", NovelIndex.NovelID + "," + std::to_string(NovelIndex.ChapterAmount) + "," + DateMatches[1].str());
-        std::cout << "No Need To Update " + NovelTitle + "\n";
         return;
     }
     std::regex DatePattern_short(R"(掲載日)", std::regex_constants::icase);
@@ -114,7 +113,6 @@ void NarouNovelManager::GetNovelInfo()
         UpdateShort();
         return;
     }
-    BookshelfManagerPtr->AppendToBookshelf("Narou.csv", NovelIndex.NovelID + "," + std::to_string(NovelIndex.ChapterAmount) + "," + NovelIndex.LastUpdatedDate);
     std::cout << "Error. Novel Is not Found";
     return;
 }
